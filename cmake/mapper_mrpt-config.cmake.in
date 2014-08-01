@@ -1,0 +1,54 @@
+# Mapper_MRPT CMake config file
+#
+# This file sets the following variables:
+# Mapper_MRPT_FOUND - Always TRUE.
+# Mapper_MRPT_INCLUDE_DIRS - Directories containing the Mapper_MRPT include files.
+# Mapper_MRPT_IDL_DIRS - Directories containing the Mapper_MRPT IDL files.
+# Mapper_MRPT_LIBRARIES - Libraries needed to use Mapper_MRPT.
+# Mapper_MRPT_DEFINITIONS - Compiler flags for Mapper_MRPT.
+# Mapper_MRPT_VERSION - The version of Mapper_MRPT found.
+# Mapper_MRPT_VERSION_MAJOR - The major version of Mapper_MRPT found.
+# Mapper_MRPT_VERSION_MINOR - The minor version of Mapper_MRPT found.
+# Mapper_MRPT_VERSION_REVISION - The revision version of Mapper_MRPT found.
+# Mapper_MRPT_VERSION_CANDIDATE - The candidate version of Mapper_MRPT found.
+
+message(STATUS "Found Mapper_MRPT-@PROJECT_VERSION@")
+set(Mapper_MRPT_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(Mapper_MRPT_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(Mapper_MRPT_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(Mapper_MRPT_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(Mapper_MRPT_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(Mapper_MRPT_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(Mapper_MRPT_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(Mapper_MRPT_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(Mapper_MRPT_VERSION @PROJECT_VERSION@)
+set(Mapper_MRPT_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(Mapper_MRPT_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(Mapper_MRPT_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(Mapper_MRPT_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+
