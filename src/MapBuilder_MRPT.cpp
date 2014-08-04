@@ -430,3 +430,29 @@ void MapBuilder_MRPT::save(void)
 		//(finalPointsMap->m_gridMaps)[0]->saveMetricMapRepresentationToFile ("map_rep_gridmap");
 	}
 }
+
+void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
+{
+	CMultiMetricMap *pMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
+	if (pMap->m_gridMaps.size() == 0) {
+		std::cerr << "[MRPT] No Grid Map Error" << std::endl;
+		return;
+	}
+
+	int width = pMap->m_gridMaps[0]->getSizeX();
+	int height = pMap->m_gridMaps[0]->getSizeY();
+
+	float resolution = pMap->m_gridMaps[0]->getResolution();
+	float xmax = pMap->m_gridMaps[0]->getXMax();
+	float xmin = pMap->m_gridMaps[0]->getXMin();
+	float ymax = pMap->m_gridMaps[0]->getYMax();
+	float ymin = pMap->m_gridMaps[0]->getYMin();
+
+	map.setSize(width, height, -xmin/resolution, -ymin/resolution);
+	map.setResolution(pMap->m_gridMaps[0]->getResolution());
+	for(int i = 0;i < height;i++) {
+		for(int j = 0;j < width;j++) {
+			map.setCell(i, j, static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
+		}
+	}
+}

@@ -99,7 +99,14 @@ Mapper_MRPTは ``Mapper_MRPTComp`` を実行（ ``${prefix}/components/bin`` に
 パラメータ       データ型           デフォルト値     意味
 ================ ================== ================ ====
 debug            int                0                
-map_update       int                1                
+map_update       string             true             
+x_min            double             -10.0            
+x_max            double             10.0             
+y_min            double             -10.0            
+y_max            double             10.0             
+resolution       double             0.05             
+log_dir          string             log_out          
+log_enable       string             log_enable       
 ================ ================== ================ ====
 
 ポート
@@ -113,7 +120,7 @@ map_update       int                1
 range           InPort      RTC::RangeData                 
 odometry        InPort      RTC::TimedPose2D               
 estimatedPose   OutPort     RTC::TimedPose2D               
-map             OutPort     RTC::OGMapTile                 
+OGMapper        ServicePort RTC::OGMapper                  
 =============== =========== ============================== ====
 
 例

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include <string>
 
 #define _USE_MATH_DEFINES
@@ -8,13 +9,13 @@
 #include <map>
 #include <string>
 #include <algorithm>
-
+#include <exception>
 
 namespace ssr {
 
 	/**
-	 *
-	 */
+	*
+	*/
 	class Position3D {
 	public:
 		Position3D(double X, double Y, double Z) {
@@ -28,8 +29,8 @@ namespace ssr {
 	};
 
 	/**
-	 *
-	 */
+	*
+	*/
 	class Pose2D {
 
 	public:
@@ -69,8 +70,8 @@ namespace ssr {
 
 
 	/**
-	 *
-	 */
+	*
+	*/
 	class Range {
 	public:
 		double* range;
@@ -85,20 +86,80 @@ namespace ssr {
 		}
 	};
 
-	/**
-	 *
-	 */
-	class Map {
+	class IndexOutOfRangeException : public ::std::exception {
 	public:
-
-		virtual bool load(const std::string& inputFileName) = 0;
-
-		virtual bool save(const std::string& outputFileName) = 0;
 	};
 
 	/**
-	 *
-	 */
+	*
+	*/
+	class Map {
+	private:
+		double m_Resolution;
+		uint32_t m_XMax, m_XMin;
+		uint32_t m_YMax, m_YMin;
+
+		uint8_t *m_pGrid;
+
+	public:
+		Map() : m_Resolution(0), m_XMax(0), m_XMin(0), m_YMax(0), m_YMin(0), m_pGrid(NULL) {
+
+		}
+
+		/*
+		Map(double resolution, uint32_t width, uint32_t height) : m_Resolution(resolution), m_Width(width), m_Height(height) {
+		if(width == 0 || height == 0) {
+		m_pGrid = NULL;
+		}
+		m_pGrid = new uint8_t[width*height];
+		}*/
+
+		~Map() {delete m_pGrid;}
+
+	public:
+		double getResolution() const { return m_Resolution; }
+		uint32_t getWidth() const { return m_XMax-m_XMin; }
+		uint32_t getHeight() const { return m_YMax - m_YMin; }
+		uint32_t getOriginX() const { return getWidth() - m_XMax; }
+		uint32_t getOriginY() const { return getHeight() - m_YMax; }
+
+		uint8_t getCell(const uint32_t x, const uint32_t y) {
+			if (x >= getWidth() || y >= getHeight()) {
+				throw IndexOutOfRangeException();
+			}
+			return m_pGrid[y*getWidth()+x];
+		}
+
+		void setResolution(const double resolution) {m_Resolution = resolution;}
+
+		void setSize(const uint32_t w, const uint32_t h, const uint32_t origin_x, const uint32_t origin_y) { 
+			if (getWidth() != w || getHeight() != h) {
+				delete m_pGrid;
+				m_pGrid = new uint8_t[w*h];
+				m_XMax = w - origin_x;
+				m_XMin = m_XMax - w;
+				m_YMax = h - origin_y;
+				m_YMin = m_YMax - h;
+			}
+		}
+
+		void setCell(const uint32_t x, const uint32_t y, const uint8_t value) {
+			if (x >= getWidth() || y >= getHeight()) {
+				throw IndexOutOfRangeException();
+			}
+			m_pGrid[y*getWidth()+x] = value;
+		}
+
+
+
+		//virtual bool load(const std::string& inputFileName) = 0;
+
+		//virtual bool save(const std::string& outputFileName) = 0;
+	};
+
+	/**
+	*
+	*/
 	class NamedString : public std::map<std::string, std::string>{
 	public:
 		NamedString() {}
@@ -117,7 +178,7 @@ namespace ssr {
 
 		bool getBool(const char* key, const bool defaultVal) {
 			if (this->find(key) == this->end()) { return defaultVal; }
-			
+
 			std::string val = this->operator[](key);
 			std::transform(val.begin(), val.end(), val.begin(), ::tolower);
 			if (val == "true") return true;
@@ -127,8 +188,8 @@ namespace ssr {
 
 
 	/**
-	 *
-	 */
+	*
+	*/
 	class MapBuilder {
 	public:
 		MapBuilder() {}
@@ -152,6 +213,8 @@ namespace ssr {
 		virtual ssr::Pose2D getEstimatedPose() = 0;
 
 		virtual void save() = 0;
+
+		virtual void getCurrentMap(ssr::Map& map) = 0;
 	};
 
 };

@@ -22,6 +22,7 @@
 
 // Service implementation headers
 // <rtc-template block="service_impl_h">
+#include "MobileRobotSVC_impl.h"
 
 // </rtc-template>
 
@@ -236,9 +237,51 @@ class Mapper_MRPT
   /*!
    * 
    * - Name:  map_update
-   * - DefaultValue: 1
+   * - DefaultValue: true
    */
-  int m_map_update;
+  std::string m_map_update;
+  /*!
+   * 
+   * - Name:  x_min
+   * - DefaultValue: -10.0
+   */
+  double m_x_min;
+  /*!
+   * 
+   * - Name:  x_max
+   * - DefaultValue: 10.0
+   */
+  double m_x_max;
+  /*!
+   * 
+   * - Name:  y_min
+   * - DefaultValue: -10.0
+   */
+  double m_y_min;
+  /*!
+   * 
+   * - Name:  y_max
+   * - DefaultValue: 10.0
+   */
+  double m_y_max;
+  /*!
+   * 
+   * - Name:  resolution
+   * - DefaultValue: 0.05
+   */
+  double m_resolution;
+  /*!
+   * 
+   * - Name:  log_dir
+   * - DefaultValue: log_out
+   */
+  std::string m_log_dir;
+  /*!
+   * 
+   * - Name:  log_enable
+   * - DefaultValue: log_enable
+   */
+  std::string m_log_enable;
 
   // </rtc-template>
 
@@ -262,20 +305,22 @@ class Mapper_MRPT
   /*!
    */
   OutPort<RTC::TimedPose2D> m_estimatedPoseOut;
-  RTC::OGMapTile m_map;
-  /*!
-   */
-  OutPort<RTC::OGMapTile> m_mapOut;
   
   // </rtc-template>
 
   // CORBA Port declaration
   // <rtc-template block="corbaport_declare">
+  /*!
+   */
+  RTC::CorbaPort m_gridMapperPort;
   
   // </rtc-template>
 
   // Service declaration
   // <rtc-template block="service_declare">
+  /*!
+   */
+  OGMapperSVC_impl m_mapper;
   
   // </rtc-template>
 
@@ -297,6 +342,7 @@ class Mapper_MRPT
   ssr::MapBuilder* m_pMapBuilder;
   bool m_FirstExecution;
   ssr::Pose2D m_OldPose;
+  ssr::Map m_Map;
 };
 
 

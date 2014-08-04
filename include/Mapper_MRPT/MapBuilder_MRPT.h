@@ -119,6 +119,8 @@ public:
 	void update3DWindow();
 
 	void save();
+
+	void getCurrentMap(ssr::Map& map);
 };
 
 };

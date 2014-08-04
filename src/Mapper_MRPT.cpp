@@ -27,11 +27,27 @@ static const char* mapper_mrpt_spec[] =
     "lang_type",         "compile",
     // Configuration variables
     "conf.default.debug", "0",
-    "conf.default.map_update", "1",
+    "conf.default.map_update", "true",
+    "conf.default.x_min", "-10.0",
+    "conf.default.x_max", "10.0",
+    "conf.default.y_min", "-10.0",
+    "conf.default.y_max", "10.0",
+    "conf.default.resolution", "0.05",
+    "conf.default.log_dir", "log_out",
+    "conf.default.log_enable", "log_enable",
     // Widget
     "conf.__widget__.debug", "text",
-    "conf.__widget__.map_update", "text",
+    "conf.__widget__.map_update", "spin",
+    "conf.__widget__.x_min", "spin",
+    "conf.__widget__.x_max", "spin",
+    "conf.__widget__.y_min", "spin",
+    "conf.__widget__.y_max", "spin",
+    "conf.__widget__.resolution", "spin",
+    "conf.__widget__.log_dir", "spin",
+    "conf.__widget__.log_enable", "spin",
     // Constraints
+    "conf.__constraints__.map_update", "true,false",
+    "conf.__constraints__.log_enable", "true,false",
     ""
   };
 // </rtc-template>
@@ -46,7 +62,7 @@ Mapper_MRPT::Mapper_MRPT(RTC::Manager* manager)
     m_rangeIn("range", m_range),
     m_odometryIn("odometry", m_odometry),
     m_estimatedPoseOut("estimatedPose", m_estimatedPose),
-    m_mapOut("map", m_map)
+    m_gridMapperPort("gridMapper")
 
     // </rtc-template>
 {
@@ -71,20 +87,29 @@ RTC::ReturnCode_t Mapper_MRPT::onInitialize()
   
   // Set OutPort buffer
   addOutPort("estimatedPose", m_estimatedPoseOut);
-  addOutPort("map", m_mapOut);
   
   // Set service provider to Ports
+  m_gridMapperPort.registerProvider("OGMapper", "RTC::OGMapper", m_mapper);
   
   // Set service consumers to Ports
   
   // Set CORBA Service Ports
+  addPort(m_gridMapperPort);
   
   // </rtc-template>
 
+  m_mapper.setMapperRTC(this);
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
   bindParameter("debug", m_debug, "0");
-  bindParameter("map_update", m_map_update, "1");
+  bindParameter("map_update", m_map_update, "true");
+  bindParameter("x_min", m_x_min, "-10.0");
+  bindParameter("x_max", m_x_max, "10.0");
+  bindParameter("y_min", m_y_min, "-10.0");
+  bindParameter("y_max", m_y_max, "10.0");
+  bindParameter("resolution", m_resolution, "0.05");
+  bindParameter("log_dir", m_log_dir, "log_out");
+  bindParameter("log_enable", m_log_enable, "log_enable");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -118,7 +143,7 @@ RTC::ReturnCode_t Mapper_MRPT::onActivated(RTC::UniqueId ec_id)
   ssr::NamedString ns;
   
   m_pMapBuilder->initialize(ns);
- m_pMapBuilder->setRangeSensorPosition(ssr::Position3D(0.2, 0, 0.3));
+  m_pMapBuilder->setRangeSensorPosition(ssr::Position3D(0.2, 0, 0.3));
   this->m_FirstExecution = true;
   //m_pMapBuilder->initialize(m_mrptSettingFileLocation + "/" +  m_mappingIniFileName, m_inputMap);
   //m_pMapBuilder->setRangeSensorPosition(Position3D(0.2, 0, 0.3));
@@ -163,6 +188,7 @@ RTC::ReturnCode_t Mapper_MRPT::onExecute(RTC::UniqueId ec_id)
   
   m_pMapBuilder->processMap();
   
+  m_pMapBuilder->getCurrentMap(m_Map);
   //m_pMapBuilder->
   m_pMapBuilder->log();
   
@@ -171,6 +197,28 @@ RTC::ReturnCode_t Mapper_MRPT::onExecute(RTC::UniqueId ec_id)
   m_estimatedPose.data.position.y = pose.y;
   m_estimatedPose.data.heading =    pose.th;
   m_estimatedPoseOut.write();
+
+  /**
+  static int counter;
+  if (counter % 10 == 0) {
+	  int width = m_Map.getWidth();
+	  int height= m_Map.getHeight();
+	  if (this->m_map.cells.length() != width*height) {
+		  m_map.cells.length(width*height);
+	  }
+	  for(int i = 0;i < height;i++) {
+		  for(int j = 0;j < width;j++) {
+			  m_map.cells[i * width + j] = m_Map.getCell(i, j);
+		  }
+	  }
+	  
+	  m_map.column = width / 2;
+	  m_map.row = height / 2;
+	  m_map.width = width;
+	  m_map.height = height;
+	  m_mapOut.write();
+  }
+  **/
 
   return RTC::RTC_OK;
 }

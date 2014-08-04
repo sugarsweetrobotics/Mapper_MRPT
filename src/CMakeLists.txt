@@ -1,4 +1,4 @@
-set(comp_srcs Mapper_MRPT.cpp MapBuilder_MRPT.cpp )
+set(comp_srcs Mapper_MRPT.cpp MobileRobotSVC_impl.cpp MapBuilder_MRPT.cpp)
 set(standalone_srcs Mapper_MRPTComp.cpp)
 
 if (DEFINED OPENRTM_INCLUDE_DIRS)
