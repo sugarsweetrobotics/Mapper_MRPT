@@ -63,7 +63,6 @@ Mapper_MRPT::Mapper_MRPT(RTC::Manager* manager)
     m_odometryIn("odometry", m_odometry),
     m_estimatedPoseOut("estimatedPose", m_estimatedPose),
     m_gridMapperPort("gridMapper")
-
     // </rtc-template>
 {
 }
