@@ -7,6 +7,7 @@
 
 #include "MobileRobotSVC_impl.h"
 
+#include "Mapper_MRPT.h"
 /*
  * Example implementational code for IDL interface RTC::OGMapper
  */
@@ -37,22 +38,20 @@ RTC::RETURN_VALUE OGMapperSVC_impl::initializeMap(const RTC::OGMapConfig& config
 
 RTC::RETURN_VALUE OGMapperSVC_impl::startMapping()
 {
-	RTC::RETURN_VALUE result;
-  // Please insert your code here and remove the following warning pragma
-#ifndef WIN32
-  #warning "Code missing in function <RTC::RETURN_VALUE OGMapperSVC_impl::startMapping()>"
-#endif
+	RTC::RETURN_VALUE result = RETURN_VALUE::RETVAL_OK;
+	if(m_pRTC->startMapping() < 0) {
+		return RETURN_VALUE::RETVAL_INVALID_PRECONDITION;
+	}
   return result;
 }
 
 RTC::RETURN_VALUE OGMapperSVC_impl::stopMapping()
 {
-	RTC::RETURN_VALUE result;
-  // Please insert your code here and remove the following warning pragma
-#ifndef WIN32
-  #warning "Code missing in function <RTC::RETURN_VALUE OGMapperSVC_impl::stopMapping()>"
-#endif
-  return result;
+	RTC::RETURN_VALUE result = RETURN_VALUE::RETVAL_OK;;
+	if(m_pRTC->stopMapping() < 0) {
+		return RETURN_VALUE::RETVAL_INVALID_PRECONDITION;
+	}
+	return result;
 }
 
 RTC::RETURN_VALUE OGMapperSVC_impl::suspendMapping()
@@ -88,11 +87,9 @@ RTC::RETURN_VALUE OGMapperSVC_impl::getState(RTC::MAPPER_STATE& state)
 RTC::RETURN_VALUE OGMapperSVC_impl::requestCurrentBuiltMap(RTC::OGMap_out map)
 {
 	RTC::RETURN_VALUE result;
-  // Please insert your code here and remove the following warning pragma
-#ifndef WIN32
-  #warning "Code missing in function <RTC::RETURN_VALUE OGMapperSVC_impl::requestCurrentBuiltMap(OCMap& map)>"
-#endif
-  return result;
+	m_pRTC->getCurrentMap(map);
+	result = RTC::RETURN_VALUE::RETVAL_OK;
+	return result;
 }
 
 

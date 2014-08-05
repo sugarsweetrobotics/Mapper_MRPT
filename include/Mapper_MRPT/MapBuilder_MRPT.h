@@ -121,6 +121,14 @@ public:
 	void save();
 
 	void getCurrentMap(ssr::Map& map);
+
+	
+	
+	int32_t startMapping();
+
+	int32_t stopMapping();
+
+	void setCurrentMap(const ssr::Map& map);
 };
 
 };

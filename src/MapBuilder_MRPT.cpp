@@ -205,7 +205,7 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 	i2.pointsMapOptions_options.insertionOpts.isPlanarMap = 1;
 	m_MapBuilder.ICP_options.mapInitializers.push_back(i2);
 
-	m_MapBuilder.options.enableMapUpdating = true;
+	m_MapBuilder.options.enableMapUpdating = false;
 
 
 //occupancyGrid_count=0
@@ -455,4 +455,22 @@ void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
 			map.setCell(i, j, static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
 		}
 	}
+}
+
+int32_t MapBuilder_MRPT::startMapping()
+{
+	this->m_MapBuilder.enableMapUpdating(true);
+	return 0;
+}
+
+int32_t MapBuilder_MRPT::stopMapping()
+{
+	this->m_MapBuilder.enableMapUpdating(false);
+	return 0;
+}
+
+
+void MapBuilder_MRPT::setCurrentMap(const ssr::Map& map)
+{
+
 }

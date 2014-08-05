@@ -343,6 +343,12 @@ class Mapper_MRPT
   bool m_FirstExecution;
   ssr::Pose2D m_OldPose;
   ssr::Map m_Map;
+
+  public:
+
+	void getCurrentMap(RTC::OGMap_out map);
+	int32_t startMapping();
+	int32_t stopMapping();
 };
 
 

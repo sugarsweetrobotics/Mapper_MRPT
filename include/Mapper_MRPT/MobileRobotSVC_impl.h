@@ -16,6 +16,8 @@
 #ifndef MOBILEROBOTSVC_IMPL_H
 #define MOBILEROBOTSVC_IMPL_H
  
+class Mapper_MRPT;
+
 /*!
  * @class OGMapperSVC_impl
  * Example class implementing IDL interface RTC::OGMapper

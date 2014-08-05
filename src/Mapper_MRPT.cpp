@@ -160,6 +160,37 @@ RTC::ReturnCode_t Mapper_MRPT::onDeactivated(RTC::UniqueId ec_id)
   return RTC::RTC_OK;
 }
 
+void Mapper_MRPT::getCurrentMap(RTC::OGMap_out map_out) {
+
+	ssr::Map map;
+	m_pMapBuilder->getCurrentMap(map);
+	map_out = new RTC::OGMap();
+	map_out->config.width = map.getWidth();
+	map_out->config.height = map.getHeight();
+	map_out->config.xScale = map.getResolution();
+	map_out->config.yScale = map.getResolution();
+	map_out->config.origin.position.x = map.getOriginX() * map.getResolution();
+	map_out->config.origin.position.y = map.getOriginY() * map.getResolution();
+	map_out->config.origin.heading = 0.0;
+	map_out->map.width = map.getWidth();
+	map_out->map.height = map.getHeight();
+	map_out->map.row = map.getOriginX();
+	map_out->map.column = map.getOriginY();
+	map_out->map.cells.length(map.getWidth() * map.getHeight());
+	for(uint32_t i = 0;i < map.getHeight();i++) {
+		for(uint32_t j = 0;j < map.getWidth();j++) {
+			map_out->map.cells[i*map.getWidth() + j] = map.getCell(i, j);
+		}
+	}
+}
+
+int32_t Mapper_MRPT::startMapping() {
+	return m_pMapBuilder->startMapping();
+}
+
+int32_t Mapper_MRPT::stopMapping() {
+	return m_pMapBuilder->stopMapping();
+}
 
 RTC::ReturnCode_t Mapper_MRPT::onExecute(RTC::UniqueId ec_id)
 {
@@ -188,8 +219,6 @@ RTC::ReturnCode_t Mapper_MRPT::onExecute(RTC::UniqueId ec_id)
   
   m_pMapBuilder->processMap();
   
-  m_pMapBuilder->getCurrentMap(m_Map);
-  //m_pMapBuilder->
   m_pMapBuilder->log();
   
   ssr::Pose2D pose = m_pMapBuilder->getEstimatedPose();
