@@ -178,7 +178,7 @@ void Mapper_MRPT::getCurrentMap(RTC::OGMap_out map_out) {
 	map_out->map.cells.length(map.getWidth() * map.getHeight());
 	for(uint32_t i = 0;i < map.getHeight();i++) {
 		for(uint32_t j = 0;j < map.getWidth();j++) {
-			map_out->map.cells[i*map.getWidth() + j] = map.getCell(i, j);
+			map_out->map.cells[(i)*map.getWidth() + (map.getWidth()-1-j)] = map.getCell(i, j);
 		}
 	}
 }

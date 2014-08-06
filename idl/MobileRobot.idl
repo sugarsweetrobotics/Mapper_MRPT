@@ -65,6 +65,15 @@ module RTC {
     RETURN_VALUE requestCurrentBuiltMap(out OGMap map);
   };
 
+  /*!
+   * @interface OGMapServer
+   * @brief Occupancy Grid Map Service Interface
+   */
+  interface OGMapServer {
+    
+    /// Request Current Build Map Data
+    RETURN_VALUE requestCurrentBuiltMap(out OGMap map);
+  };
   
 
 };
