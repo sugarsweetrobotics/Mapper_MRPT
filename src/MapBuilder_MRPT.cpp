@@ -6,8 +6,6 @@
 
 #include <mrpt/base.h>
 #include <mrpt/obs.h>
-#include <mrpt/hwdrivers/CHokuyoURG.h>
-#include <mrpt/hwdrivers/CSerialPort.h>
 
 
 using namespace mrpt::utils;

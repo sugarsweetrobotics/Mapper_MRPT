@@ -120,7 +120,7 @@ namespace ssr {
 		double getResolution() const { return m_Resolution; }
 		uint32_t getWidth() const { return m_XMax-m_XMin; }
 		uint32_t getHeight() const { return m_YMax - m_YMin; }
-		int32_t getOriginX() const { return - getWidth() + m_XMax; }
+		int32_t getOriginX() const { return getWidth() - m_XMax; }
 		int32_t getOriginY() const { return getHeight() - m_YMax; }
 
 		uint8_t getCell(const uint32_t x, const uint32_t y) {
