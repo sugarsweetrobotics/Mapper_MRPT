@@ -236,10 +236,10 @@ class Mapper_MRPT
   int m_debug;
   /*!
    * 
-   * - Name:  map_update
-   * - DefaultValue: true
+   * - Name:  start_map_update_in_activated
+   * - DefaultValue: false
    */
-  std::string m_map_update;
+  std::string m_start_map_update_in_activated;
   /*!
    * 
    * - Name:  x_min
@@ -270,6 +270,25 @@ class Mapper_MRPT
    * - DefaultValue: 0.05
    */
   double m_resolution;
+  /*!
+   * 
+   * - Name:  init_pose_x
+   * - DefaultValue: 0.0
+   */
+  double m_init_pose_x;
+  /*!
+   * 
+   * - Name:  init_pose_y
+   * - DefaultValue: 0.0
+   */
+  double m_init_pose_y;
+  /*!
+   * 
+   * - Name:  init_pose_th
+   * - DefaultValue: 0.0
+   */
+  double m_init_pose_th;
+
   /*!
    * 
    * - Name:  log_dir

@@ -14,6 +14,17 @@
 #define TAG_CAMERA_3DSCENE_FOLLOWS_ROBOT "CAMERA_3DSCENE_FOLLOWS_ROBOT"
 #define TAG_ALWAYS_INSERT_BY_CLASS "alwaysInsertByClass"
 #define TAG_SHOW_PROGRESS_3D  "SHOW_PROGRESS_3D_REAL_TIME"
+#define TAG_ENABLE_LOGGING "enable_logging"
+#define TAG_VERBOSE  "verbose"
+
+#define TAG_MAP_MAX_X "map_max_x"
+#define TAG_MAP_MAX_Y "map_max_y"
+#define TAG_MAP_MIN_X "map_min_x"
+#define TAG_MAP_MIN_Y "map_min_y"
+#define TAG_MAP_RESOLUTION "map_resolution"
+#define TAG_INIT_X "init_x"
+#define TAG_INIT_Y "init_y"
+#define TAG_INIT_TH "init_th"
 
 #define DEFAULT_RAWLOGOFFSET 0
 #define DEFAULT_LOGOUTDIR "log_out"
@@ -23,6 +34,18 @@
 #define DEFAULT_CAMERA_3DSCENE_FOLLOWS_ROBOT true
 #define DEFAULT_SHOW_PROGRESS_3D_REAL_TIME false
 #define DEFAULT_SHOW_PROGRESS_REAL_TIME_DELAY_MS 0
+
+#define DEFAULT_MAP_MAX_X 10.0f
+#define DEFAULT_MAP_MAX_Y 10.0f
+#define DEFAULT_MAP_MIN_X -10.0f
+#define DEFAULT_MAP_MIN_Y -10.0f
+#define DEFAULT_MAP_RESOLUTION 0.05
+#define DEFAULT_INIT_X 0.0f
+#define DEFAULT_INIT_Y 0.0f
+#define DEFAULT_INIT_TH 0.0f
+
+#define DEFAULT_VERBOSE false
+#define DEFAULT_ENABLE_LOGGING false 
 
 
 #include <mrpt/base.h>
@@ -58,7 +81,9 @@ private:
 	bool m_SavePoseLog;
 	bool m_Save3DScene;
 	bool m_Camera3DSceneFollowsRobot;
-	//bool m_ShowProgress3DRealTime;
+	bool m_ShowProgress3DRealTime;
+	bool m_Logging;
+	bool m_Verbose;
 	//int	m_ShowProgress3DRealTimeDelayMs;
 
 	float m_range_min;
@@ -99,10 +124,10 @@ public:
 
 
 	
-	bool initialize(ssr::NamedString& parameter);
+	bool initialize(ssr::NamedString& parameter, ssr::Map* pMap=NULL);
 
 	bool setRangeSensorPosition(const ssr::Position3D& position) {
-		m_RangeSensorPose = mrpt::poses::CPose3D(position.x, position.y, position.z);
+		m_RangeSensorPose = mrpt::poses::CPose3D(position.x, position.y, position.z, position.roll, position.pitch, position.yaw);
 		return true;
 	}
 

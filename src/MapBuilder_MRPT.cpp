@@ -79,8 +79,6 @@ bool Map_MRPT::save(const std::string& fileName)
 
 MapBuilder_MRPT::MapBuilder_MRPT()
 {
-	//m_ShowProgress3DRealTime = DEFAULT_SHOW_PROGRESS_3D_REAL_TIME;
-	//m_ShowProgress3DRealTimeDelayMs = DEFAULT_SHOW_PROGRESS_REAL_TIME_DELAY_MS;
 	this->m_range_max = 20.0;
 	this->m_range_min = 0.10;
 }
@@ -91,27 +89,24 @@ MapBuilder_MRPT::~MapBuilder_MRPT()
 }
 
 
-bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter) 
+bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter, ssr::Map* pMap /*=NULL*/) 
 {
-	
 	m_ActionCollection.clear();
 	m_SensoryFrame.clear();
 
-
-	//CConfigFile settingFile(settingFileName.c_str());
 	m_RawLogOffset = parameter.getInt(TAG_RAWLOGOFFSET, DEFAULT_RAWLOGOFFSET);
 	m_LogOutDir = parameter.getString(TAG_LOGOUTPUT_DIR, DEFAULT_LOGOUTDIR);
-
 	m_LogFrequency = parameter.getInt(TAG_LOG_FREQUENCY, DEFAULT_LOGFREQ);
 	m_SavePoseLog = parameter.getBool(TAG_SAVE_POSE_LOG, DEFAULT_SAVE_POSE_LOG);
 	m_Save3DScene = parameter.getBool(TAG_SAVE_3D_SCENE, DEFAULT_SAVE_3D_SCENE);
 	m_Camera3DSceneFollowsRobot = parameter.getBool(TAG_CAMERA_3DSCENE_FOLLOWS_ROBOT, DEFAULT_CAMERA_3DSCENE_FOLLOWS_ROBOT);
+	m_ShowProgress3DRealTime = parameter.getBool(TAG_SHOW_PROGRESS_3D, DEFAULT_SHOW_PROGRESS_3D_REAL_TIME);
+	m_Save3DScene = true;
 
-	//MRPT_LOAD_CONFIG_VAR(m_ShowProgress3DRealTime, bool,  settingFile, TAG_APP);
-	//m_ShowProgress3DRealTime = parameter.getBool(TAG_SHOW_PROGRESS_3D, DEFAULT_SHOW_PROGRESS_3D_REAL_TIME);
-	//MRPT_LOAD_CONFIG_VAR(m_ShowProgress3DRealTimeDelayMs, int, settingFile, TAG_APP);
+	m_Logging = parameter.getBool(TAG_ENABLE_LOGGING, DEFAULT_ENABLE_LOGGING);
+	m_Verbose = parameter.getBool(TAG_VERBOSE, DEFAULT_VERBOSE);
 
-
+	/* ICP_param */
 	m_MapBuilder.ICP_params.maxIterations    = 80;    // The maximum number of iterations to execute if convergence is not achieved before
 	m_MapBuilder.ICP_params.minAbsStep_trans = 1e-6;  // If the correction in all translation coordinates (X,Y,Z) is below this threshold (in meters), iterations are terminated:
 	m_MapBuilder.ICP_params.minAbsStep_rot   = 1e-6;  // If the correction in all rotation coordinates (yaw,pitch,roll) is below this threshold (in radians), iterations are terminated:
@@ -132,23 +127,8 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 	// Reduce to "1" to obtain the best accuracy
 	m_MapBuilder.ICP_params.corresponding_points_decimation = 5;;
 
-// The source file (RAW-LOG) with action/observation pairs
-//rawlog_file=../../datasets/2006-01ENE-21-SENA_Telecom Faculty_one_loop_only.rawlog
-	//m_MapBuilder.ICP_options.rawlog_offset=0;
-
-// The directory where the log files will be saved (left in blank if no log is required)
-	//logOutput_dir=LOG_ICP-SLAM_MRPT
-	//LOG_FREQUENCY=50			// The frequency of log files generation:
-	//SAVE_3D_SCENE=1
-	//SAVE_POSE_LOG=1
-	//CAMERA_3DSCENE_FOLLOWS_ROBOT=1
-	//SHOW_PROGRESS_3D_REAL_TIME=1
-
-//SHOW_PROGRESS_3D_REAL_TIME_DELAY_MS=5
-	m_MapBuilder.ICP_options.localizationLinDistance = 0.2;
-//localizationLinDistance	= 0.2	// The distance threshold for correcting odometry with ICP (meters)  
-	m_MapBuilder.ICP_options.localizationAngDistance = 5;
-	//localizationAngDistance	= 5	// The distance threshold for correcting odometry with ICP (degrees)
+	m_MapBuilder.ICP_options.localizationLinDistance = 0.2;// The distance threshold for correcting odometry with ICP (meters)  
+	m_MapBuilder.ICP_options.localizationAngDistance = 5;// The distance threshold for correcting odometry with ICP (degrees)
 
 
 	m_MapBuilder.ICP_options.insertionLinDistance	= 1.2;	// The distance threshold for inserting observations in the map (meters)
@@ -159,23 +139,13 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 // Neeeded for LM method, which only supports point-map to point-map matching.
 	m_MapBuilder.ICP_options.matchAgainstTheGrid = 0;
 
-
-
-// ====================================================
-//
-//            MULTIMETRIC MAP CONFIGURATION
-//
-// ====================================================
-// Creation of maps:
-	//m_MapBuilder.ICP_options.mapInitializers.options.
-	//m_MapBuilder.ICP_options.
 	mrpt::slam::TMetricMapInitializer i;
 	i.metricMapClassType = CLASS_ID( COccupancyGridMap2D );
-	float gridResolution = 0.05; // 5 [cm]
-
-	i.occupancyGridMap2D_options.resolution = gridResolution;
-	//i.occupancyGridMap2D_options.likelihoodOpts.likelihoodMethod = mrpt::slam::CMultiMetricMap::TOptions::TMapSelectionForLikelihood::mapFuseAll;
-	//i.occupancyGridMap2D_options
+	i.occupancyGridMap2D_options.max_x = parameter.getFloat(TAG_MAP_MAX_X, DEFAULT_MAP_MAX_X);
+	i.occupancyGridMap2D_options.max_y = parameter.getFloat(TAG_MAP_MAX_Y, DEFAULT_MAP_MAX_Y);
+	i.occupancyGridMap2D_options.min_x = parameter.getFloat(TAG_MAP_MIN_X, DEFAULT_MAP_MIN_X);
+	i.occupancyGridMap2D_options.min_y = parameter.getFloat(TAG_MAP_MIN_Y, DEFAULT_MAP_MIN_Y);
+	i.occupancyGridMap2D_options.resolution = parameter.getFloat(TAG_MAP_RESOLUTION, DEFAULT_MAP_RESOLUTION);
 
 	i.occupancyGridMap2D_options.insertionOpts.mapAltitude = 0;
 	i.occupancyGridMap2D_options.insertionOpts.useMapAltitude = 0;
@@ -183,7 +153,6 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 	i.occupancyGridMap2D_options.insertionOpts.maxOccupancyUpdateCertainty = 0.55;
 	i.occupancyGridMap2D_options.insertionOpts.considerInvalidRangesAsFreeSpace = 1;
 	i.occupancyGridMap2D_options.insertionOpts.wideningBeamsWithDistance = 0;
-
 
 	i.occupancyGridMap2D_options.likelihoodOpts.likelihoodMethod = mrpt::slam::COccupancyGridMap2D::lmLikelihoodField_Thrun;
 	i.occupancyGridMap2D_options.likelihoodOpts.LF_decimation = 5;
@@ -193,7 +162,6 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 	i.occupancyGridMap2D_options.likelihoodOpts.LF_zRandom = 0.001;
 	i.occupancyGridMap2D_options.likelihoodOpts.LF_maxRange = 30;
 	i.occupancyGridMap2D_options.likelihoodOpts.LF_alternateAverageMethod = 0;
-
 	m_MapBuilder.ICP_options.mapInitializers.push_back(i);
 
 	mrpt::slam::TMetricMapInitializer i2;
@@ -205,49 +173,45 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 
 	m_MapBuilder.options.enableMapUpdating = false;
 
+	double init_x = parameter.getFloat(TAG_INIT_X, DEFAULT_INIT_X);
+	double init_y = parameter.getFloat(TAG_INIT_Y, DEFAULT_INIT_Y);
+	double init_th = parameter.getFloat(TAG_INIT_TH, DEFAULT_INIT_TH);
 
-//occupancyGrid_count=0
-//gasGrid_count=0
-//landmarksMap_count=0
-//beaconMap_count=0
-//pointsMap_count=1
+	//m_MapBuilder.initialize();
+	mrpt:poses::CPosePDFGaussian pose(mrpt::poses::CPose2D(init_x, init_y, init_th));
+	mrpt::slam::CSimpleMap map;
+	mrpt::slam::COccupancyGridMap2D gmap;
+	//gmap.
 
-// Selection of map for likelihood: (fuseAll=-1,occGrid=0, points=1,landmarks=2,gasGrid=3)
-	//likelihoodMapSelection=-1
-
-
-	//m_MapBuilder.ICP_params.
-
-	//m_MapBuilder.ICP_options.loadFromConfigFile( settingFile, TAG_APP);
-	//m_MapBuilder.ICP_params.loadFromConfigFile ( settingFile, TAG_ICP);
-	m_MapBuilder.initialize();
-	//if(parameterFileName != "") {
-	//	m_MapBuilder.setCurrentMapFile(parameterFileName.c_str());
-	//	m_MapBuilder.enableMapUpdating(false);
-
-	// PosePDFクラスをうまく初期化できれば、マップ上の任意の点で再開できるはず。
-	//mrpt::poses::CPosePDF p;
-	//CSimpleMap map;
-	//map.loadFromFile(parameterFileName.c_str());
-	//m_MapBuilder.initialize(map, &p);
+	m_MapBuilder.initialize(mrpt::slam::CSimpleMap(), &pose);
 	
-	m_MapBuilder.options.verbose = true;
-    m_MapBuilder.options.alwaysInsertByClass.fromString("");
-	m_MapBuilder.ICP_params.dumpToConsole();
-	m_MapBuilder.ICP_options.dumpToConsole();
+
+	/* For Logging and Verbosity */
+	m_MapBuilder.options.alwaysInsertByClass.fromString("");
+
+	if(m_Verbose) {
+		m_MapBuilder.options.verbose = true;
+		m_MapBuilder.ICP_params.dumpToConsole();
+		m_MapBuilder.ICP_options.dumpToConsole();
+	}
 
 	m_ActionCollection.clear();
 	m_SensoryFrame.clear();
 
-	deleteFilesInDirectory(m_LogOutDir.c_str());
-	createDirectory(m_LogOutDir.c_str());
+	if(m_Logging) {
+		deleteFilesInDirectory(m_LogOutDir.c_str());
+		createDirectory(m_LogOutDir.c_str());
+		m_LogCount = 0;
+		deleteFilesInDirectory(m_LogOutDir.c_str());
+		createDirectory(m_LogOutDir.c_str());
+	}
 
 //	m_TimeStampLogFile.open(format("%s/log_times.txt", m_LogOutDir.c_str()));
 //	m_EstimatedPathLogFile.open(format("%s/log_estimated_path.txt", m_LogOutDir.c_str()));
 //	m_OdometryPathLogFile.open(format("%s/log_odometry_path.txt", m_LogOutDir.c_str()));
 
 #if MRPT_HAS_WXWIDGETS
-	//if (m_ShowProgress3DRealTime)
+	if (m_ShowProgress3DRealTime)
 	{
 		m_3DWindow = CDisplayWindow3D::Create("ICP-SLAM @ MRPT C++ Library", 600, 500);
 		m_3DWindow->setCameraZoom(20);
@@ -255,12 +219,7 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 	}
 #endif
 
-	m_LogCount = 0;
 
-	
-
-	deleteFilesInDirectory(m_LogOutDir.c_str());
-	createDirectory(m_LogOutDir.c_str());
 	return true;
 }
 
@@ -317,20 +276,19 @@ Pose2D MapBuilder_MRPT::getEstimatedPose()
 
 void MapBuilder_MRPT::log()
 {
+	if (m_Logging) {
 	if(m_LogCount % this->m_LogFrequency == 0) {
 		CPose3DPDFPtr poseEstimation = m_MapBuilder.getCurrentPoseEstimation();
 		if(m_SavePoseLog) {
 			poseEstimation->saveToTextFile( format("%s/mapbuilder_posepdf_%03d.txt", m_LogOutDir.c_str(), m_LogCount));
 		}
-	
-		update3DWindow();
+	}
 	}
 	//m_EstimatedPathLogFile.printf("%i %f %f %f\n", m_LogCount, poseEstimation->getMeanVal().x(), poseEstimation->getMeanVal().y(), poseEstimation->getMeanVal().yaw());
 	m_LogCount++;
 }
 void MapBuilder_MRPT::update3DWindow()
 {
-	CMultiMetricMap* currentMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
 	if(m_3DWindow.present()) {
 		CPose3D robotPose;
 		m_MapBuilder.getCurrentPoseEstimation()->getMean(robotPose);
@@ -364,6 +322,7 @@ void MapBuilder_MRPT::update3DWindow()
 		view_map->insert(CRenderizablePtr(gridPlane));
 
 		CSetOfObjectsPtr objects = CSetOfObjects::Create();
+		CMultiMetricMap* currentMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
 		currentMap->getAs3DObject(objects);
 		view->insert(objects);
 
@@ -388,7 +347,8 @@ void MapBuilder_MRPT::update3DWindow()
 			m_3DWindow->setCameraPointingToPoint(robotPose.x(), robotPose.y(), robotPose.z());
 			m_3DWindow->forceRepaint();
 		}
-				// Save as file:
+		
+		// Save as file:
 		if (m_Save3DScene)
 		{
 			static int step;
@@ -405,27 +365,29 @@ void MapBuilder_MRPT::update3DWindow()
 
 void MapBuilder_MRPT::save(void)
 {
-	CSimpleMap map;
-	m_MapBuilder.getCurrentlyBuiltMap(map);
+	if (m_Logging) {
+		CSimpleMap map;
+		m_MapBuilder.getCurrentlyBuiltMap(map);
 
 
-	std::string str = format("%s/_finalmap_.simplemap", m_LogOutDir.c_str());
-	printf("Dumping final map in binary format to: %s\n", str.c_str() );
-	m_MapBuilder.saveCurrentMapToFile(str);
+		std::string str = format("%s/_finalmap_.simplemap", m_LogOutDir.c_str());
+		printf("Dumping final map in binary format to: %s\n", str.c_str() );
+		m_MapBuilder.saveCurrentMapToFile(str);
 
-	CMultiMetricMap  *finalPointsMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
-	str = format("%s/_finalmaps_.txt", m_LogOutDir.c_str());
-	printf("Dumping final metric maps to %s_XXX\n", str.c_str() );
-	finalPointsMap->saveMetricMapRepresentationToFile( str );
+		CMultiMetricMap  *finalPointsMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
+		str = format("%s/_finalmaps_.txt", m_LogOutDir.c_str());
+		printf("Dumping final metric maps to %s_XXX\n", str.c_str() );
+		finalPointsMap->saveMetricMapRepresentationToFile( str );
 
-	if(finalPointsMap->m_gridMaps.size() != 0) {
-		///finalPointsMap->
-		str = format("%s/_finalmaps_.gridmap", m_LogOutDir.c_str());
-		CFileOutputStream out_s(str);
-		out_s << (finalPointsMap->m_gridMaps)[0];
-		out_s.close();
+		if(finalPointsMap->m_gridMaps.size() != 0) {
+			///finalPointsMap->
+			str = format("%s/_finalmaps_.gridmap", m_LogOutDir.c_str());
+			CFileOutputStream out_s(str);
+			out_s << (finalPointsMap->m_gridMaps)[0];
+			out_s.close();
 
-		//(finalPointsMap->m_gridMaps)[0]->saveMetricMapRepresentationToFile ("map_rep_gridmap");
+			//(finalPointsMap->m_gridMaps)[0]->saveMetricMapRepresentationToFile ("map_rep_gridmap");
+		}
 	}
 }
 

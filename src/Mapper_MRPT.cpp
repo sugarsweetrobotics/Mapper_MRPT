@@ -27,12 +27,15 @@ static const char* mapper_mrpt_spec[] =
     "lang_type",         "compile",
     // Configuration variables
     "conf.default.debug", "0",
-    "conf.default.map_update", "true",
+    "conf.default.start_map_update_in_activated", "false",
     "conf.default.x_min", "-10.0",
     "conf.default.x_max", "10.0",
     "conf.default.y_min", "-10.0",
     "conf.default.y_max", "10.0",
     "conf.default.resolution", "0.05",
+	"conf.default.init_pose_x", "0.0",
+	"conf.default.init_pose_y", "0.0",
+	"conf.default.init_pose_th", "0.0",
     "conf.default.log_dir", "log_out",
     "conf.default.log_enable", "log_enable",
     // Widget
@@ -101,7 +104,7 @@ RTC::ReturnCode_t Mapper_MRPT::onInitialize()
   // <rtc-template block="bind_config">
   // Bind variables and configuration variable
   bindParameter("debug", m_debug, "0");
-  bindParameter("map_update", m_map_update, "true");
+  bindParameter("start_map_update_in_activated", m_start_map_update_in_activated, "false");
   bindParameter("x_min", m_x_min, "-10.0");
   bindParameter("x_max", m_x_max, "10.0");
   bindParameter("y_min", m_y_min, "-10.0");
@@ -109,6 +112,9 @@ RTC::ReturnCode_t Mapper_MRPT::onInitialize()
   bindParameter("resolution", m_resolution, "0.05");
   bindParameter("log_dir", m_log_dir, "log_out");
   bindParameter("log_enable", m_log_enable, "log_enable");
+  bindParameter("init_pose_x", m_init_pose_x, "0.0");
+  bindParameter("init_pose_y", m_init_pose_y, "0.0");
+  bindParameter("init_pose_th", m_init_pose_th, "0.0");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -140,9 +146,29 @@ RTC::ReturnCode_t Mapper_MRPT::onActivated(RTC::UniqueId ec_id)
 {
   m_pMapBuilder = new ssr::MapBuilder_MRPT();
   ssr::NamedString ns;
-  
+  ns[TAG_MAP_MAX_X] = m_x_max;
+  ns[TAG_MAP_MAX_Y] = m_y_max;
+  ns[TAG_MAP_MIN_X] = m_x_min;
+  ns[TAG_MAP_MIN_Y] = m_y_min;
+  ns[TAG_MAP_RESOLUTION] = m_resolution;
+
+  ns[TAG_INIT_X] = m_init_pose_x;
+  ns[TAG_INIT_Y] = m_init_pose_y;
+  ns[TAG_INIT_TH] = m_init_pose_th;
+
+  if (m_debug) {
+	  ns[TAG_SHOW_PROGRESS_3D] = "true";
+
+	  ns[TAG_VERBOSE] = "true";
+  }
+
+  if (m_log_enable == "true" || m_log_enable == "True" || m_log_enable == "TRUE") {
+  	  ns[TAG_ENABLE_LOGGING] = "true";
+  }
   m_pMapBuilder->initialize(ns);
-  m_pMapBuilder->setRangeSensorPosition(ssr::Position3D(0.2, 0, 0.3));
+
+  m_pMapBuilder->setRangeSensorPosition(ssr::Position3D(0, 0, 0, 0, 0, 0));
+
   this->m_FirstExecution = true;
   //m_pMapBuilder->initialize(m_mrptSettingFileLocation + "/" +  m_mappingIniFileName, m_inputMap);
   //m_pMapBuilder->setRangeSensorPosition(Position3D(0.2, 0, 0.3));
@@ -210,9 +236,19 @@ RTC::ReturnCode_t Mapper_MRPT::onExecute(RTC::UniqueId ec_id)
   if(m_rangeIn.isNew()) {
     m_rangeIn.read();
     ssr::Range range(&(m_range.ranges[0]), m_range.ranges.length(), m_range.config.maxAngle - m_range.config.minAngle);
+	/*
     for(size_t i = 0;i < m_range.ranges.length();i++) {
       range.range[i] = m_range.ranges[i];
     }
+	*/
+	ssr::Position3D pos(m_range.geometry.geometry.pose.position.x,
+		m_range.geometry.geometry.pose.position.y,
+		m_range.geometry.geometry.pose.position.z,
+		m_range.geometry.geometry.pose.orientation.r,
+		m_range.geometry.geometry.pose.orientation.p,
+		m_range.geometry.geometry.pose.orientation.y
+		);
+	m_pMapBuilder->setRangeSensorPosition(pos);
     m_pMapBuilder->addRange(range);
   }
   

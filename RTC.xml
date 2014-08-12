@@ -23,7 +23,7 @@
         <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="debug" rtc:unit="" rtc:defaultValue="0" rtc:type="int" rtc:name="debug">
             <rtcExt:Properties rtcExt:value="text" rtcExt:name="__widget__"/>
         </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="map_update" rtc:unit="" rtc:defaultValue="true" rtc:type="string" rtc:name="map_update">
+        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="start_map_update_in_activated" rtc:unit="" rtc:defaultValue="false" rtc:type="string" rtc:name="start_map_update_in_activated">
             <rtc:Constraint>
                 <rtc:ConstraintListType>
                     <rtc:Constraint>
@@ -59,7 +59,16 @@
         <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="resolution" rtc:unit="meter" rtc:defaultValue="0.05" rtc:type="double" rtc:name="resolution">
             <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
         </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="log_dir" rtc:unit="" rtc:defaultValue="log_out" rtc:type="string" rtc:name="log_dir">
+      <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="init_pose_x" rtc:unit="meter" rtc:defaultValue="0.0" rtc:type="double" rtc:name="init_pose_x">
+        <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
+      </rtc:Configuration>
+      <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="init_pose_y" rtc:unit="meter" rtc:defaultValue="0.0" rtc:type="double" rtc:name="init_pose_y">
+        <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
+      </rtc:Configuration>
+      <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="init_pose_th" rtc:unit="meter" rtc:defaultValue="0.0" rtc:type="double" rtc:name="init_pose_th">
+        <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
+      </rtc:Configuration>
+      <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="log_dir" rtc:unit="" rtc:defaultValue="log_out" rtc:type="string" rtc:name="log_dir">
             <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
         </rtc:Configuration>
         <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="log_enable" rtc:unit="" rtc:defaultValue="log_enable" rtc:type="string" rtc:name="log_enable">

@@ -18,15 +18,21 @@ namespace ssr {
 	*/
 	class Position3D {
 	public:
-		Position3D(double X, double Y, double Z) {
+		Position3D(double X, double Y, double Z, double Roll, double Pitch, double Yaw) {
 			x = X; y = Y; z = Z;
+			roll = Roll; pitch = Pitch; yaw = Yaw;
 		}
 
 	public:
 		double x;
 		double y;
 		double z;
+
+		double roll;
+		double pitch;
+		double yaw;
 	};
+
 
 	/**
 	*
@@ -82,7 +88,7 @@ namespace ssr {
 			this->aperture = Aperture;
 			this->size = Size;
 			this->range = new double[size];
-			memcpy(this->range, Range, Size);
+			memcpy(this->range, Range, Size*sizeof(double));
 		}
 	};
 
@@ -184,6 +190,13 @@ namespace ssr {
 			if (val == "true") return true;
 			else return false;
 		}
+
+		float getFloat(const char* key, const float defaultVal) {
+			if (this->find(key) == this->end()) { return defaultVal; }
+
+			std::string val = this->operator[](key);
+			return atof(val.c_str());
+		}
 	};
 
 
@@ -196,7 +209,7 @@ namespace ssr {
 		virtual ~MapBuilder() {}
 
 	public:
-		virtual bool initialize( NamedString& namedString) = 0;
+		virtual bool initialize( NamedString& namedString, ssr::Map* pMap=NULL) = 0;
 
 		virtual bool setRangeSensorPosition(const ssr::Position3D& position) = 0;
 
