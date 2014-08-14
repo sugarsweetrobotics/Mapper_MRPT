@@ -25,13 +25,26 @@ Currently, This component is tested in Windows 7 x64, Visual C++ 2010
   Do not select mrpt-1.0.2-msvc10-x32-kinect.exe. I've not tested.
   Currently, This version of MRPT is the only available package for VC2010.
 
-1.2 How to use
- This component has simple interfaces
+1.2 CMake
+  Launch cmake-gui and drag'n'drop the CMakeLists.txt file (which is located in the top-level folder) to the CMake.
+  Create build directory for the cmake-generating files. Change the edit box entitled "Where to build the binaries" from %PATH_TO%Mapper_MRPT to %PATH_TO%Mapper_MRPT\build.
+  Then, configure. Select Visual Studio 10 (for vc 2010), and generate.
 
+1.3 VC2010
+  You can find the VC2010 solution file in %PATH_TO%Mapper_MRPT\build\Mapper_MRPT.sln. Open the solution, and build it in Release setting.
+  You can find the executable in %PATH_TO%Mapper_MRPT\build\src\Release\Mapper_MRPTComp.exe
+
+2 How to use
+ If you are beginner in OpenRTM, follow the instruction in http://openrtm.org or http://ysuga.net
+
+ This component has simple interfaces
  Inport : 
-   currentPose : TimedPose2D - Current Pose of Robot which is estimated with odometry.
+   currentPose : TimedPose2D - Current Pose of Robot which is estimated with odometry. Currently, many robots are available for this interfaces. ex., Roomba, Kobuki, Pioneer3, and many. If you can not find robot RTCs, ask in OpenRTM-aist ML
+  http://openrtm.org/openrtm/en/content/mailing-lists
+
    range : RangeData - Acquired by URG RTC. Please check following RTC
      https://github.com/sugarsweetrobotics/UrgRTC
+
  OutPort : 
    estimatedPose : TimedPose2D - Estimated Pose by SLAM algorithm (icpClassic)
 
