@@ -89,7 +89,7 @@ MapBuilder_MRPT::~MapBuilder_MRPT()
 }
 
 
-bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter, ssr::Map* pMap /*=NULL*/) 
+bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter) 
 {
 	m_ActionCollection.clear();
 	m_SensoryFrame.clear();
@@ -178,7 +178,7 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter, ssr::Map* pMap /*=
 	double init_th = parameter.getFloat(TAG_INIT_TH, DEFAULT_INIT_TH);
 
 	//m_MapBuilder.initialize();
-	mrpt:poses::CPosePDFGaussian pose(mrpt::poses::CPose2D(init_x, init_y, init_th));
+	mrpt::poses::CPosePDFGaussian pose(mrpt::poses::CPose2D(init_x, init_y, init_th));
 	mrpt::slam::CSimpleMap map;
 	mrpt::slam::COccupancyGridMap2D gmap;
 	//gmap.

@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <exception>
 
+#include <sstream>
+
 namespace ssr {
 
 	/**
@@ -171,6 +173,18 @@ namespace ssr {
 		NamedString() {}
 		~NamedString() {}
 
+		/*
+		NamedString(const NamedString& ns) {
+			
+		}*/
+
+	public:
+		void setFloat(const char* key, const float value) {
+			std::ostringstream oss;
+			oss << value;
+			this->operator[](key) = oss.str(); 
+		}
+
 	public:
 		std::string getString(const char* key, const char* defaultVal) {
 			if (find(key) == this->end()) { return defaultVal; }
@@ -195,7 +209,7 @@ namespace ssr {
 			if (this->find(key) == this->end()) { return defaultVal; }
 
 			std::string val = this->operator[](key);
-			return atof(val.c_str());
+			return (float)atof(val.c_str());
 		}
 	};
 
@@ -209,7 +223,7 @@ namespace ssr {
 		virtual ~MapBuilder() {}
 
 	public:
-		virtual bool initialize( NamedString& namedString, ssr::Map* pMap=NULL) = 0;
+		virtual bool initialize(ssr::NamedString& namedString /*, ssr::Map* pMap=NULL*/) = 0;
 
 		virtual bool setRangeSensorPosition(const ssr::Position3D& position) = 0;
 

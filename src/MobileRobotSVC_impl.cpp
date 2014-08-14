@@ -38,18 +38,18 @@ RTC::RETURN_VALUE OGMapperSVC_impl::initializeMap(const RTC::OGMapConfig& config
 
 RTC::RETURN_VALUE OGMapperSVC_impl::startMapping()
 {
-	RTC::RETURN_VALUE result = RETURN_VALUE::RETVAL_OK;
+	RTC::RETURN_VALUE result = RETVAL_OK;
 	if(m_pRTC->startMapping() < 0) {
-		return RETURN_VALUE::RETVAL_INVALID_PRECONDITION;
+		return RETVAL_INVALID_PRECONDITION;
 	}
   return result;
 }
 
 RTC::RETURN_VALUE OGMapperSVC_impl::stopMapping()
 {
-	RTC::RETURN_VALUE result = RETURN_VALUE::RETVAL_OK;;
+	RTC::RETURN_VALUE result = RETVAL_OK;;
 	if(m_pRTC->stopMapping() < 0) {
-		return RETURN_VALUE::RETVAL_INVALID_PRECONDITION;
+		return RETVAL_INVALID_PRECONDITION;
 	}
 	return result;
 }
@@ -88,7 +88,7 @@ RTC::RETURN_VALUE OGMapperSVC_impl::requestCurrentBuiltMap(RTC::OGMap_out map)
 {
 	RTC::RETURN_VALUE result;
 	m_pRTC->getCurrentMap(map);
-	result = RTC::RETURN_VALUE::RETVAL_OK;
+	result = RETVAL_OK;
 	return result;
 }
 

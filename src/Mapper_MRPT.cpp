@@ -146,15 +146,15 @@ RTC::ReturnCode_t Mapper_MRPT::onActivated(RTC::UniqueId ec_id)
 {
   m_pMapBuilder = new ssr::MapBuilder_MRPT();
   ssr::NamedString ns;
-  ns[TAG_MAP_MAX_X] = m_x_max;
-  ns[TAG_MAP_MAX_Y] = m_y_max;
-  ns[TAG_MAP_MIN_X] = m_x_min;
-  ns[TAG_MAP_MIN_Y] = m_y_min;
-  ns[TAG_MAP_RESOLUTION] = m_resolution;
+  ns.setFloat(TAG_MAP_MAX_X, m_x_max);
+  ns.setFloat(TAG_MAP_MAX_Y, m_y_max);
+  ns.setFloat(TAG_MAP_MIN_X, m_x_min);
+  ns.setFloat(TAG_MAP_MIN_Y, m_y_min);
+  ns.setFloat(TAG_MAP_RESOLUTION, m_resolution);
 
-  ns[TAG_INIT_X] = m_init_pose_x;
-  ns[TAG_INIT_Y] = m_init_pose_y;
-  ns[TAG_INIT_TH] = m_init_pose_th;
+  ns.setFloat(TAG_INIT_X, m_init_pose_x);
+  ns.setFloat(TAG_INIT_Y, m_init_pose_y);
+  ns.setFloat(TAG_INIT_TH, m_init_pose_th);
 
   if (m_debug) {
 	  ns[TAG_SHOW_PROGRESS_3D] = "true";

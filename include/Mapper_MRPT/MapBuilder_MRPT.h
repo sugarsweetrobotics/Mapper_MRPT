@@ -112,7 +112,7 @@ public:
 	/**
 	 * Destructor
 	 */
-	~MapBuilder_MRPT();
+	virtual ~MapBuilder_MRPT();
 
 
 public:
@@ -122,9 +122,7 @@ public:
 
 public:
 
-
-	
-	bool initialize(ssr::NamedString& parameter, ssr::Map* pMap=NULL);
+	bool initialize(ssr::NamedString& parameter);
 
 	bool setRangeSensorPosition(const ssr::Position3D& position) {
 		m_RangeSensorPose = mrpt::poses::CPose3D(position.x, position.y, position.z, position.roll, position.pitch, position.yaw);
