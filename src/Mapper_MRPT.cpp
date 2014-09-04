@@ -187,15 +187,17 @@ RTC::ReturnCode_t Mapper_MRPT::onDeactivated(RTC::UniqueId ec_id)
 
 void Mapper_MRPT::getCurrentMap(RTC::OGMap_out map_out) {
 
+	m_mapperMutex.lock();
 	ssr::Map map;
 	m_pMapBuilder->getCurrentMap(map);
+	m_mapperMutex.unlock();
 	map_out = new RTC::OGMap();
 	map_out->config.width = map.getWidth();
 	map_out->config.height = map.getHeight();
 	map_out->config.xScale = map.getResolution();
 	map_out->config.yScale = map.getResolution();
-	map_out->config.origin.position.x = map.getOriginX() * map.getResolution();
-	map_out->config.origin.position.y = map.getOriginY() * map.getResolution();
+	map_out->config.origin.position.x = -map.getOriginX() * map.getResolution();
+	map_out->config.origin.position.y = -map.getOriginY() * map.getResolution();
 	map_out->config.origin.heading = 0.0;
 	map_out->map.width = map.getWidth();
 	map_out->map.height = map.getHeight();
@@ -252,7 +254,9 @@ RTC::ReturnCode_t Mapper_MRPT::onExecute(RTC::UniqueId ec_id)
     m_pMapBuilder->addRange(range);
   }
   
+  m_mapperMutex.lock();
   m_pMapBuilder->processMap();
+  m_mapperMutex.unlock();
   
   m_pMapBuilder->log();
   
@@ -321,6 +325,14 @@ RTC::ReturnCode_t Mapper_MRPT::onRateChanged(RTC::UniqueId ec_id)
 }
 */
 
+
+RTC::MAPPER_STATE Mapper_MRPT::getState() {
+  if(m_pMapBuilder->isMapping()) {
+    return MAPPER_MAPPING;
+  } else {
+    return MAPPER_STOPPED;
+  }
+}
 
 
 extern "C"

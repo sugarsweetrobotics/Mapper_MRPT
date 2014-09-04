@@ -76,11 +76,8 @@ RTC::RETURN_VALUE OGMapperSVC_impl::resumeMapping()
 
 RTC::RETURN_VALUE OGMapperSVC_impl::getState(RTC::MAPPER_STATE& state)
 {
-	RTC::RETURN_VALUE result;
-  // Please insert your code here and remove the following warning pragma
-#ifndef WIN32
-  #warning "Code missing in function <RTC::RETURN_VALUE OGMapperSVC_impl::getState(MAPPER_STATE& state)>"
-#endif
+  RTC::RETURN_VALUE result = RETVAL_OK;
+  state = m_pRTC->getState();
   return result;
 }
 

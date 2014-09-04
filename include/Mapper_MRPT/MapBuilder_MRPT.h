@@ -102,6 +102,9 @@ private:
 	mrpt::slam::CSensoryFrame m_SensoryFrame;
 	mrpt::poses::CPose3D m_RangeSensorPose;
 
+
+	bool m_isMapping;
+
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	/**
@@ -152,6 +155,8 @@ public:
 	int32_t stopMapping();
 
 	void setCurrentMap(const ssr::Map& map);
-};
+	
+	bool isMapping() { return m_isMapping; }
+  };
 
 };

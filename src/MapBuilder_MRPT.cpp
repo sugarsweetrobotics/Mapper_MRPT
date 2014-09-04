@@ -81,6 +81,7 @@ MapBuilder_MRPT::MapBuilder_MRPT()
 {
 	this->m_range_max = 20.0;
 	this->m_range_min = 0.10;
+	this->m_isMapping = false;
 }
 
 MapBuilder_MRPT::~MapBuilder_MRPT()
@@ -412,7 +413,7 @@ void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
 	map.setResolution(pMap->m_gridMaps[0]->getResolution());
 	for(int i = 0;i < height;i++) {
 		for(int j = 0;j < width;j++) {
-			map.setCell(i, j, static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
+			map.setCell(j, (height-1-i), static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
 		}
 	}
 }
@@ -420,12 +421,14 @@ void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
 int32_t MapBuilder_MRPT::startMapping()
 {
 	this->m_MapBuilder.enableMapUpdating(true);
+	this->m_isMapping = true;
 	return 0;
 }
 
 int32_t MapBuilder_MRPT::stopMapping()
 {
 	this->m_MapBuilder.enableMapUpdating(false);
+	this->m_isMapping = false;
 	return 0;
 }
 

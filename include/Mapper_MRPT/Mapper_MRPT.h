@@ -368,6 +368,10 @@ class Mapper_MRPT
 	void getCurrentMap(RTC::OGMap_out map);
 	int32_t startMapping();
 	int32_t stopMapping();
+
+  RTC::MAPPER_STATE getState();
+  coil::Mutex m_mapperMutex;
+
 };
 
 

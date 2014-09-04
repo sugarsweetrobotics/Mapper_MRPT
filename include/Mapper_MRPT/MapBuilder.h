@@ -248,6 +248,8 @@ namespace ssr {
 		virtual int32_t stopMapping() = 0;
 
 		virtual void setCurrentMap(const ssr::Map& map) = 0;
+		
+		virtual bool isMapping() = 0;
 	};
 
 };
