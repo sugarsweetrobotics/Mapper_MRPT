@@ -402,18 +402,26 @@ void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
 
 	int width = pMap->m_gridMaps[0]->getSizeX();
 	int height = pMap->m_gridMaps[0]->getSizeY();
+	//int height = pMap->m_gridMaps[0]->getSizeX();
+	//int width = pMap->m_gridMaps[0]->getSizeY();
 
 	float resolution = pMap->m_gridMaps[0]->getResolution();
 	float xmax = pMap->m_gridMaps[0]->getXMax();
 	float xmin = pMap->m_gridMaps[0]->getXMin();
 	float ymax = pMap->m_gridMaps[0]->getYMax();
 	float ymin = pMap->m_gridMaps[0]->getYMin();
+	//float ymax = pMap->m_gridMaps[0]->getXMax();
+	//float ymin = pMap->m_gridMaps[0]->getXMin();
+	//float xmax = pMap->m_gridMaps[0]->getYMax();
+	//float xmin = pMap->m_gridMaps[0]->getYMin();
 
-	map.setSize(width, height, -xmin/resolution, -ymin/resolution);
+	map.setSize(width, height, xmin/resolution, -ymin/resolution);
 	map.setResolution(pMap->m_gridMaps[0]->getResolution());
 	for(int i = 0;i < height;i++) {
 		for(int j = 0;j < width;j++) {
-			map.setCell(j, (height-1-i), static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
+			map.setCell(j, (height-i-1), static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(j, i)));
+//			map.setCell((width-j-1), i, static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
+//			map.setCell(j, (height-1-i), static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
 		}
 	}
 }
