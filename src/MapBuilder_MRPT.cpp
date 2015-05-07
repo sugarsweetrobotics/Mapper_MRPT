@@ -415,7 +415,7 @@ void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
 	//float xmax = pMap->m_gridMaps[0]->getYMax();
 	//float xmin = pMap->m_gridMaps[0]->getYMin();
 
-	map.setSize(width, height, xmin/resolution, -ymin/resolution);
+	map.setSize(width, height, xmin/resolution, ymax/resolution);
 	map.setResolution(pMap->m_gridMaps[0]->getResolution());
 	for(int i = 0;i < height;i++) {
 		for(int j = 0;j < width;j++) {
