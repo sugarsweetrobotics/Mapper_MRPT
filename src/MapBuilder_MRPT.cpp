@@ -128,12 +128,12 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 	// Reduce to "1" to obtain the best accuracy
 	m_MapBuilder.ICP_params.corresponding_points_decimation = 5;;
 
-	m_MapBuilder.ICP_options.localizationLinDistance = 0.2;// The distance threshold for correcting odometry with ICP (meters)  
-	m_MapBuilder.ICP_options.localizationAngDistance = 5;// The distance threshold for correcting odometry with ICP (degrees)
+	m_MapBuilder.ICP_options.localizationLinDistance = parameter.getFloat(TAG_LOCALIZATION_LIN_DIST, DEFAULT_LOCALIZATION_LIN_DIST);//0.2;// The distance threshold for correcting odometry with ICP (meters)  
+	m_MapBuilder.ICP_options.localizationAngDistance = parameter.getFloat(TAG_LOCALIZATION_ANG_DIST, DEFAULT_LOCALIZATION_ANG_DIST);// The distance threshold for correcting odometry with ICP (rad)
 
 
-	m_MapBuilder.ICP_options.insertionLinDistance	= 1.2;	// The distance threshold for inserting observations in the map (meters)
-	m_MapBuilder.ICP_options.insertionAngDistance	= 45.0;	// The distance threshold for inserting observations in the map (degrees)
+	m_MapBuilder.ICP_options.insertionLinDistance	= parameter.getFloat(TAG_INSERTION_LIN_DIST, DEFAULT_INSERTION_LIN_DIST);//;	// The distance threshold for inserting observations in the map (meters)
+	m_MapBuilder.ICP_options.insertionAngDistance	= parameter.getFloat(TAG_INSERTION_ANG_DIST, DEFAULT_INSERTION_ANG_DIST);// 0.8;	// The distance threshold for inserting observations in the map (rad)
 
 	m_MapBuilder.ICP_options.minICPgoodnessToAccept	= 0.40;	// Minimum ICP quality to accept correction [0,1].
 

@@ -288,7 +288,30 @@ class Mapper_MRPT
    * - DefaultValue: 0.0
    */
   double m_init_pose_th;
-
+  /*!
+   * 
+   * - Name:  localization_lin_distance
+   * - DefaultValue: 0.
+   */
+  double m_localization_lin_distance;
+  /*!
+   * 
+   * - Name:  localization_ang_distance
+   * - DefaultValue: 0.
+   */
+  double m_localization_ang_distance;
+  /*!
+   * 
+   * - Name:  insertion_lin_distance
+   * - DefaultValue: 0.
+   */
+  double m_insertion_lin_distance;
+  /*!
+   * 
+   * - Name:  insertion_ang_distance
+   * - DefaultValue: 0.
+   */
+  double m_insertion_ang_distance;
   /*!
    * 
    * - Name:  log_dir

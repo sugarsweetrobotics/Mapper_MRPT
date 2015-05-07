@@ -26,6 +26,12 @@
 #define TAG_INIT_Y "init_y"
 #define TAG_INIT_TH "init_th"
 
+#define TAG_LOCALIZATION_LIN_DIST "localizationLinDistance"
+#define TAG_LOCALIZATION_ANG_DIST "localizationAngDistance"
+
+#define TAG_INSERTION_LIN_DIST "insertionLinDistance"
+#define TAG_INSERTION_ANG_DIST "insertionAngDistance"
+
 #define DEFAULT_RAWLOGOFFSET 0
 #define DEFAULT_LOGOUTDIR "log_out"
 #define DEFAULT_LOGFREQ 5 
@@ -43,6 +49,11 @@
 #define DEFAULT_INIT_X 0.0f
 #define DEFAULT_INIT_Y 0.0f
 #define DEFAULT_INIT_TH 0.0f
+
+#define DEFAULT_LOCALIZATION_LIN_DIST 0.5
+#define DEFAULT_LOCALIZATION_ANG_DIST 0.8
+#define DEFAULT_INSERTION_LIN_DIST 1.0
+#define DEFAULT_INSERTION_ANG_DIST 1.0
 
 #define DEFAULT_VERBOSE false
 #define DEFAULT_ENABLE_LOGGING false 

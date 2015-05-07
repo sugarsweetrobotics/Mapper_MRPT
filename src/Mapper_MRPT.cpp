@@ -38,6 +38,10 @@ static const char* mapper_mrpt_spec[] =
 	"conf.default.init_pose_th", "0.0",
     "conf.default.log_dir", "log_out",
     "conf.default.log_enable", "log_enable",
+    "conf.default.localization_lin_distance", "0.5",
+    "conf.default.localization_ang_distance", "0.8",
+    "conf.default.insertion_lin_distance", "1.0",
+    "conf.default.insertion_ang_distance", "1.0",
     // Widget
     "conf.__widget__.debug", "text",
     "conf.__widget__.map_update", "spin",
@@ -115,6 +119,11 @@ RTC::ReturnCode_t Mapper_MRPT::onInitialize()
   bindParameter("init_pose_x", m_init_pose_x, "0.0");
   bindParameter("init_pose_y", m_init_pose_y, "0.0");
   bindParameter("init_pose_th", m_init_pose_th, "0.0");
+  
+  bindParameter("insertion_lin_distance", m_insertion_lin_distance, "1.0");
+  bindParameter("insertion_ang_distance", m_insertion_ang_distance, "1.0");
+  bindParameter("localization_lin_distance", m_localization_lin_distance, "0.5");
+  bindParameter("localization_ang_distance", m_localization_ang_distance, "0.8");
   // </rtc-template>
   
   return RTC::RTC_OK;
@@ -155,6 +164,11 @@ RTC::ReturnCode_t Mapper_MRPT::onActivated(RTC::UniqueId ec_id)
   ns.setFloat(TAG_INIT_X, m_init_pose_x);
   ns.setFloat(TAG_INIT_Y, m_init_pose_y);
   ns.setFloat(TAG_INIT_TH, m_init_pose_th);
+
+  ns.setFloat(TAG_INSERTION_LIN_DIST,  m_insertion_lin_distance);
+  ns.setFloat(TAG_INSERTION_ANG_DIST,  m_insertion_ang_distance);
+  ns.setFloat(TAG_LOCALIZATION_LIN_DIST,  m_localization_lin_distance);
+  ns.setFloat(TAG_LOCALIZATION_ANG_DIST,  m_localization_ang_distance);
 
   if (m_debug) {
 	  ns[TAG_SHOW_PROGRESS_3D] = "true";
