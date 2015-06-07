@@ -61,6 +61,7 @@
 
 #include <mrpt/base.h>
 #include <mrpt/slam.h>
+#include <mrpt/maps.h>
 #include <mrpt/gui.h>
 #include <mrpt/utils.h>
 
@@ -69,10 +70,10 @@ namespace ssr {
 
 class Map_MRPT : public ssr::Map {
 private:
-	mrpt::slam::CMultiMetricMap* m_pMap;
+  mrpt::maps::CMultiMetricMap* m_pMap;
 public:
 	Map_MRPT();
-	Map_MRPT(mrpt::slam::CMultiMetricMap* pMap);
+	Map_MRPT(mrpt::maps::CMultiMetricMap* pMap);
 	~Map_MRPT();
 public:
 	bool load(const std::string& inputFileName);
@@ -109,8 +110,8 @@ private:
 	
 	mrpt::gui::CDisplayWindow3DPtr	m_3DWindow;
 
-	mrpt::slam::CActionCollection m_ActionCollection;
-	mrpt::slam::CSensoryFrame m_SensoryFrame;
+	mrpt::obs::CActionCollection m_ActionCollection;
+	mrpt::obs::CSensoryFrame m_SensoryFrame;
 	mrpt::poses::CPose3D m_RangeSensorPose;
 
 

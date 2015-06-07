@@ -26,9 +26,9 @@ Map_MRPT::Map_MRPT()
 	m_pMap = NULL;
 }
 
-Map_MRPT::Map_MRPT(CMultiMetricMap* pMap)
+Map_MRPT::Map_MRPT(mrpt::maps::CMultiMetricMap* pMap)
 {
-	m_pMap = new CMultiMetricMap(*pMap);
+  m_pMap = new mrpt::maps::CMultiMetricMap(*pMap);
 }
 
 Map_MRPT::~Map_MRPT()
@@ -40,12 +40,12 @@ Map_MRPT::~Map_MRPT()
 
 bool Map_MRPT::load(const std::string& fileName)
 {
-	m_pMap = new CMultiMetricMap();
+  m_pMap = new mrpt::maps::CMultiMetricMap();
 
 	std::string simpleMapExt = ".simplemap";
 	if(fileName.compare(fileName.length() - simpleMapExt.length(), simpleMapExt.length(), simpleMapExt) == 0) {
 		CFileInputStream simpleMapFile(fileName);
-		CSimpleMap map;
+		mrpt::maps::CSimpleMap map;
 		simpleMapFile >> map;
 		m_pMap->loadFromSimpleMap(map);
 	}
@@ -53,7 +53,7 @@ bool Map_MRPT::load(const std::string& fileName)
 	std::string gridMapExt = ".gridmap";
 	if(fileName.compare(fileName.length() - gridMapExt.length(), gridMapExt.length(), gridMapExt) == 0) {
 		CFileInputStream gridMapFile(fileName);
-		COccupancyGridMap2D map;
+		mrpt::maps::COccupancyGridMap2D map;
 		gridMapFile >> map;
 		
 	}
@@ -139,37 +139,40 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 
 // Neeeded for LM method, which only supports point-map to point-map matching.
 	m_MapBuilder.ICP_options.matchAgainstTheGrid = 0;
+	
+	//mrpt::slam::TMetricMapInitializer i;
+	//i.metricMapClassType = CLASS_ID( COccupancyGridMap2D );
+	mrpt::maps::COccupancyGridMap2D::TMapDefinition i;
+	i.max_x = parameter.getFloat(TAG_MAP_MAX_X, DEFAULT_MAP_MAX_X);
+	i.max_y = parameter.getFloat(TAG_MAP_MAX_Y, DEFAULT_MAP_MAX_Y);
+	i.min_x = parameter.getFloat(TAG_MAP_MIN_X, DEFAULT_MAP_MIN_X);
+	i.min_y = parameter.getFloat(TAG_MAP_MIN_Y, DEFAULT_MAP_MIN_Y);
+	i.resolution = parameter.getFloat(TAG_MAP_RESOLUTION, DEFAULT_MAP_RESOLUTION);
 
-	mrpt::slam::TMetricMapInitializer i;
-	i.metricMapClassType = CLASS_ID( COccupancyGridMap2D );
-	i.occupancyGridMap2D_options.max_x = parameter.getFloat(TAG_MAP_MAX_X, DEFAULT_MAP_MAX_X);
-	i.occupancyGridMap2D_options.max_y = parameter.getFloat(TAG_MAP_MAX_Y, DEFAULT_MAP_MAX_Y);
-	i.occupancyGridMap2D_options.min_x = parameter.getFloat(TAG_MAP_MIN_X, DEFAULT_MAP_MIN_X);
-	i.occupancyGridMap2D_options.min_y = parameter.getFloat(TAG_MAP_MIN_Y, DEFAULT_MAP_MIN_Y);
-	i.occupancyGridMap2D_options.resolution = parameter.getFloat(TAG_MAP_RESOLUTION, DEFAULT_MAP_RESOLUTION);
+	i.insertionOpts.mapAltitude = 0;
+	i.insertionOpts.useMapAltitude = 0;
+	i.insertionOpts.maxDistanceInsertion = 25;
+	i.insertionOpts.maxOccupancyUpdateCertainty = 0.55;
+	i.insertionOpts.considerInvalidRangesAsFreeSpace = 1;
+	i.insertionOpts.wideningBeamsWithDistance = 0;
 
-	i.occupancyGridMap2D_options.insertionOpts.mapAltitude = 0;
-	i.occupancyGridMap2D_options.insertionOpts.useMapAltitude = 0;
-	i.occupancyGridMap2D_options.insertionOpts.maxDistanceInsertion = 25;
-	i.occupancyGridMap2D_options.insertionOpts.maxOccupancyUpdateCertainty = 0.55;
-	i.occupancyGridMap2D_options.insertionOpts.considerInvalidRangesAsFreeSpace = 1;
-	i.occupancyGridMap2D_options.insertionOpts.wideningBeamsWithDistance = 0;
+	i.likelihoodOpts.likelihoodMethod = mrpt::maps::COccupancyGridMap2D::lmLikelihoodField_Thrun;
+	i.likelihoodOpts.LF_decimation = 5;
+	i.likelihoodOpts.LF_stdHit = 0.20;
 
-	i.occupancyGridMap2D_options.likelihoodOpts.likelihoodMethod = mrpt::slam::COccupancyGridMap2D::lmLikelihoodField_Thrun;
-	i.occupancyGridMap2D_options.likelihoodOpts.LF_decimation = 5;
-	i.occupancyGridMap2D_options.likelihoodOpts.LF_stdHit = 0.20;
-	i.occupancyGridMap2D_options.likelihoodOpts.LF_maxCorrsDistance = 0.30;
-	i.occupancyGridMap2D_options.likelihoodOpts.LF_zHit = 0.999;
-	i.occupancyGridMap2D_options.likelihoodOpts.LF_zRandom = 0.001;
-	i.occupancyGridMap2D_options.likelihoodOpts.LF_maxRange = 30;
-	i.occupancyGridMap2D_options.likelihoodOpts.LF_alternateAverageMethod = 0;
+	i.likelihoodOpts.LF_maxCorrsDistance = 0.30;
+	i.likelihoodOpts.LF_zHit = 0.999;
+	i.likelihoodOpts.LF_zRandom = 0.001;
+	i.likelihoodOpts.LF_maxRange = 30;
+	i.likelihoodOpts.LF_alternateAverageMethod = 0;
+
 	m_MapBuilder.ICP_options.mapInitializers.push_back(i);
-
-	mrpt::slam::TMetricMapInitializer i2;
-	i2.metricMapClassType = CLASS_ID( CSimplePointsMap );
-	i2.pointsMapOptions_options.insertionOpts.minDistBetweenLaserPoints = 0.05;
-	i2.pointsMapOptions_options.insertionOpts.fuseWithExisting = false;
-	i2.pointsMapOptions_options.insertionOpts.isPlanarMap = 1;
+	//mrpt::maps::TMetricMapInitializer i2;
+	mrpt::maps::CSimplePointsMap::TMapDefinition i2;
+	//i2.metricMapClassType = CLASS_ID( mrpt::maps::CSimplePointsMap );
+	i2.insertionOpts.minDistBetweenLaserPoints = 0.05;
+	i2.insertionOpts.fuseWithExisting = false;
+	i2.insertionOpts.isPlanarMap = 1;
 	m_MapBuilder.ICP_options.mapInitializers.push_back(i2);
 
 	m_MapBuilder.options.enableMapUpdating = false;
@@ -180,11 +183,11 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 
 	//m_MapBuilder.initialize();
 	mrpt::poses::CPosePDFGaussian pose(mrpt::poses::CPose2D(init_x, init_y, init_th));
-	mrpt::slam::CSimpleMap map;
-	mrpt::slam::COccupancyGridMap2D gmap;
+	mrpt::maps::CSimpleMap map;
+	mrpt::maps::COccupancyGridMap2D gmap;
 	//gmap.
 
-	m_MapBuilder.initialize(mrpt::slam::CSimpleMap(), &pose);
+	m_MapBuilder.initialize(mrpt::maps::CSimpleMap(), &pose);
 	
 
 	/* For Logging and Verbosity */
@@ -226,8 +229,8 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 
 bool MapBuilder_MRPT::addPose(const ssr::Pose2D& deltaPose)
 {
-	CActionRobotMovement2D action;
-	CActionRobotMovement2D::TMotionModelOptions options;
+  mrpt::obs::CActionRobotMovement2D action;
+  mrpt::obs::CActionRobotMovement2D::TMotionModelOptions options;
 	action.computeFromOdometry(CPose2D(deltaPose.x, deltaPose.y, deltaPose.th), options);
 	action.timestamp = mrpt::system::getCurrentTime();
 	static TTimeStamp oldTimestamp;
@@ -241,7 +244,7 @@ bool MapBuilder_MRPT::addPose(const ssr::Pose2D& deltaPose)
 
 bool MapBuilder_MRPT::addRange(const ssr::Range& range)
 {
-	CObservation2DRangeScanPtr observation = CObservation2DRangeScan::Create();
+  mrpt::obs::CObservation2DRangeScanPtr observation = mrpt::obs::CObservation2DRangeScan::Create();
 	observation->rightToLeft = true;
 	observation->validRange.resize(range.size);
 	observation->scan.resize(range.size);
@@ -281,7 +284,7 @@ void MapBuilder_MRPT::log()
 	if(m_LogCount % this->m_LogFrequency == 0) {
 		CPose3DPDFPtr poseEstimation = m_MapBuilder.getCurrentPoseEstimation();
 		if(m_SavePoseLog) {
-			poseEstimation->saveToTextFile( format("%s/mapbuilder_posepdf_%03d.txt", m_LogOutDir.c_str(), m_LogCount));
+		  poseEstimation->saveToTextFile( mrpt::format("%s/mapbuilder_posepdf_%03d.txt", m_LogOutDir.c_str(), m_LogCount));
 		}
 	}
 	}
@@ -291,11 +294,13 @@ void MapBuilder_MRPT::log()
 void MapBuilder_MRPT::update3DWindow()
 {
 	if(m_3DWindow.present()) {
-		CPose3D robotPose;
+	  // this function is deplicated
+	  /*
+                mrpt::posesCPose3D robotPose;
 		m_MapBuilder.getCurrentPoseEstimation()->getMean(robotPose);
 
-		COpenGLScenePtr scene = COpenGLScene::Create();
-		COpenGLViewportPtr view = scene->getViewport("main");
+		mrpt::opengl::COpenGLScenePtr scene = COpenGLScene::Create();
+		mrpt::opengl::COpenGLViewportPtr view = scene->getViewport("main");
 		ASSERT_(view);
 
 		COpenGLViewportPtr view_map = scene->createViewport("mini-map");
@@ -323,7 +328,7 @@ void MapBuilder_MRPT::update3DWindow()
 		view_map->insert(CRenderizablePtr(gridPlane));
 
 		CSetOfObjectsPtr objects = CSetOfObjects::Create();
-		CMultiMetricMap* currentMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
+		mrpt::maps::CMultiMetricMap* currentMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
 		currentMap->getAs3DObject(objects);
 		view->insert(objects);
 
@@ -354,12 +359,12 @@ void MapBuilder_MRPT::update3DWindow()
 		{
 			static int step;
 			if(step++ % 100) {
-				CFileGZOutputStream	f( format( "%s/buildingmap_%05u.3Dscene", m_LogOutDir.c_str(), step ));
+			  CFileGZOutputStream	f( mrpt::format( "%s/buildingmap_%05u.3Dscene", m_LogOutDir.c_str(), step ));
 				f << *scene;
 			}
 		}
 
-
+	  */
 	}
 }
 
@@ -367,22 +372,22 @@ void MapBuilder_MRPT::update3DWindow()
 void MapBuilder_MRPT::save(void)
 {
 	if (m_Logging) {
-		CSimpleMap map;
+	  mrpt::maps::CSimpleMap map;
 		m_MapBuilder.getCurrentlyBuiltMap(map);
 
 
-		std::string str = format("%s/_finalmap_.simplemap", m_LogOutDir.c_str());
+		std::string str = mrpt::format("%s/_finalmap_.simplemap", m_LogOutDir.c_str());
 		printf("Dumping final map in binary format to: %s\n", str.c_str() );
 		m_MapBuilder.saveCurrentMapToFile(str);
 
-		CMultiMetricMap  *finalPointsMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
-		str = format("%s/_finalmaps_.txt", m_LogOutDir.c_str());
+		mrpt::maps::CMultiMetricMap  *finalPointsMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
+		str = mrpt::format("%s/_finalmaps_.txt", m_LogOutDir.c_str());
 		printf("Dumping final metric maps to %s_XXX\n", str.c_str() );
 		finalPointsMap->saveMetricMapRepresentationToFile( str );
 
 		if(finalPointsMap->m_gridMaps.size() != 0) {
 			///finalPointsMap->
-			str = format("%s/_finalmaps_.gridmap", m_LogOutDir.c_str());
+		  str = mrpt::format("%s/_finalmaps_.gridmap", m_LogOutDir.c_str());
 			CFileOutputStream out_s(str);
 			out_s << (finalPointsMap->m_gridMaps)[0];
 			out_s.close();
@@ -394,7 +399,7 @@ void MapBuilder_MRPT::save(void)
 
 void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
 {
-	CMultiMetricMap *pMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
+  mrpt::maps::CMultiMetricMap *pMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
 	if (pMap->m_gridMaps.size() == 0) {
 		std::cerr << "[MRPT] No Grid Map Error" << std::endl;
 		return;
