@@ -112,8 +112,8 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 	m_MapBuilder.ICP_params.minAbsStep_trans = 1e-6;  // If the correction in all translation coordinates (X,Y,Z) is below this threshold (in meters), iterations are terminated:
 	m_MapBuilder.ICP_params.minAbsStep_rot   = 1e-6;  // If the correction in all rotation coordinates (yaw,pitch,roll) is below this threshold (in radians), iterations are terminated:
 
-	m_MapBuilder.ICP_params.thresholdDist    = 0.3;   // Initial maximum distance for matching a pair of points
-	m_MapBuilder.ICP_params.thresholdAng = RADIANS(5.0);     // An angular factor (in degrees) to increase the matching distance for distant points.
+	m_MapBuilder.ICP_params.thresholdDist    = 0.2;   // Initial maximum distance for matching a pair of points
+	m_MapBuilder.ICP_params.thresholdAng = RADIANS(10.0);     // An angular factor (in degrees) to increase the matching distance for distant points.
 
 	m_MapBuilder.ICP_params.ALFA             = 0.8;   // After convergence, the thresholds are multiplied by this constant and ICP keep running (provides finer matching)
 
@@ -128,7 +128,7 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 	// Reduce to "1" to obtain the best accuracy
 	m_MapBuilder.ICP_params.corresponding_points_decimation = 5;;
 
-	m_MapBuilder.ICP_options.localizationLinDistance = parameter.getFloat(TAG_LOCALIZATION_LIN_DIST, DEFAULT_LOCALIZATION_LIN_DIST);//0.2;// The distance threshold for correcting odometry with ICP (meters)  
+	m_MapBuilder.ICP_options.localizationLinDistance = parameter.getFloat(TAG_LOCALIZATION_LIN_DIST, DEFAULT_LOCALIZATION_LIN_DIST);// The distance threshold for correcting odometry with ICP (meters)  
 	m_MapBuilder.ICP_options.localizationAngDistance = parameter.getFloat(TAG_LOCALIZATION_ANG_DIST, DEFAULT_LOCALIZATION_ANG_DIST);// The distance threshold for correcting odometry with ICP (rad)
 
 
@@ -257,6 +257,7 @@ bool MapBuilder_MRPT::addRange(const ssr::Range& range)
 	}
 	observation->setSensorPose(m_RangeSensorPose);
 	m_SensoryFrame.insert(observation);
+
 	return true;
 }
 

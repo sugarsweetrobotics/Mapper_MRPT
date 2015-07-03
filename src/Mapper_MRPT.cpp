@@ -38,8 +38,8 @@ static const char* mapper_mrpt_spec[] =
 	"conf.default.init_pose_th", "0.0",
     "conf.default.log_dir", "log_out",
     "conf.default.log_enable", "log_enable",
-    "conf.default.localization_lin_distance", "0.5",
-    "conf.default.localization_ang_distance", "0.8",
+    "conf.default.localization_lin_distance", "0.1",
+    "conf.default.localization_ang_distance", "0.3",
     "conf.default.insertion_lin_distance", "1.0",
     "conf.default.insertion_ang_distance", "1.0",
     // Widget
@@ -205,24 +205,26 @@ void Mapper_MRPT::getCurrentMap(RTC::OGMap_out map_out) {
 	ssr::Map map;
 	m_pMapBuilder->getCurrentMap(map);
 	m_mapperMutex.unlock();
-	map_out = new RTC::OGMap();
-	map_out->config.width = map.getWidth();
-	map_out->config.height = map.getHeight();
-	map_out->config.xScale = map.getResolution();
-	map_out->config.yScale = map.getResolution();
-	map_out->config.origin.position.x = -map.getOriginX() * map.getResolution();
-	map_out->config.origin.position.y = -map.getOriginY() * map.getResolution();
-	map_out->config.origin.heading = 0.0;
-	map_out->map.width = map.getWidth();
-	map_out->map.height = map.getHeight();
-	map_out->map.row = 0;
-	map_out->map.column = 0;
-	map_out->map.cells.length(map.getWidth() * map.getHeight());
+	RTC::OGMap_var map_var = new RTC::OGMap();
+	//map_out = new RTC::OGMap();
+	map_var->config.width = map.getWidth();
+	map_var->config.height = map.getHeight();
+	map_var->config.xScale = map.getResolution();
+	map_var->config.yScale = map.getResolution();
+	map_var->config.origin.position.x = -map.getOriginX() * map.getResolution();
+	map_var->config.origin.position.y = -map.getOriginY() * map.getResolution();
+	map_var->config.origin.heading = 0.0;
+	map_var->map.width = map.getWidth();
+	map_var->map.height = map.getHeight();
+	map_var->map.row = 0;
+	map_var->map.column = 0;
+	map_var->map.cells.length(map.getWidth() * map.getHeight());
 	for(uint32_t i = 0;i < map.getHeight();i++) {
 		for(uint32_t j = 0;j < map.getWidth();j++) {
-			map_out->map.cells[(i)*map.getWidth() + j] = map.getCell(j, i);
+			map_var->map.cells[(i)*map.getWidth() + j] = map.getCell(j, i);
 		}
 	}
+	map_out = map_var._retn();
 }
 
 int32_t Mapper_MRPT::startMapping() {
