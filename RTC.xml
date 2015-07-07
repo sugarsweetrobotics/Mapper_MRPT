@@ -1,103 +1,101 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<rtc:RtcProfile rtc:version="0.2" rtc:id="RTC:ssr:Navigation:Mapper_MRPT:1.0.0" xmlns:rtcExt="http://www.openrtp.org/namespaces/rtc_ext" xmlns:rtcDoc="http://www.openrtp.org/namespaces/rtc_doc" xmlns:rtc="http://www.openrtp.org/namespaces/rtc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <rtc:BasicInfo xsi:type="rtcExt:basic_info_ext" rtcExt:saveProject="Mapper_MRPT" rtc:updateDate="2014-08-03T01:28:08.596+09:00" rtc:creationDate="2014-07-24T17:37:07+09:00" rtc:version="1.0.0" rtc:vendor="ssr" rtc:maxInstances="1" rtc:executionType="PeriodicExecutionContext" rtc:executionRate="1000.0" rtc:description="Mapper RTC using MRPT" rtc:category="Navigation" rtc:componentKind="DataFlowComponent" rtc:activityType="EVENTDRIVEN" rtc:componentType="STATIC" rtc:name="Mapper_MRPT">
-        <rtcExt:VersionUpLogs></rtcExt:VersionUpLogs>
-    </rtc:BasicInfo>
-    <rtc:Actions>
-        <rtc:OnInitialize xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
-        <rtc:OnFinalize xsi:type="rtcDoc:action_status_doc" rtc:implemented="false"/>
-        <rtc:OnStartup xsi:type="rtcDoc:action_status_doc" rtc:implemented="false"/>
-        <rtc:OnShutdown xsi:type="rtcDoc:action_status_doc" rtc:implemented="false"/>
-        <rtc:OnActivated xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
-        <rtc:OnDeactivated xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
-        <rtc:OnAborting xsi:type="rtcDoc:action_status_doc" rtc:implemented="false"/>
-        <rtc:OnError xsi:type="rtcDoc:action_status_doc" rtc:implemented="false"/>
-        <rtc:OnReset xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
-        <rtc:OnExecute xsi:type="rtcDoc:action_status_doc" rtc:implemented="true"/>
-        <rtc:OnStateUpdate xsi:type="rtcDoc:action_status_doc" rtc:implemented="false"/>
-        <rtc:OnRateChanged xsi:type="rtcDoc:action_status_doc" rtc:implemented="false"/>
-        <rtc:OnAction xsi:type="rtcDoc:action_status_doc" rtc:implemented="false"/>
-        <rtc:OnModeChanged xsi:type="rtcDoc:action_status_doc" rtc:implemented="false"/>
-    </rtc:Actions>
-    <rtc:ConfigurationSet>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="debug" rtc:unit="" rtc:defaultValue="0" rtc:type="int" rtc:name="debug">
-            <rtcExt:Properties rtcExt:value="text" rtcExt:name="__widget__"/>
-        </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="start_map_update_in_activated" rtc:unit="" rtc:defaultValue="false" rtc:type="string" rtc:name="start_map_update_in_activated">
-            <rtc:Constraint>
-                <rtc:ConstraintListType>
-                    <rtc:Constraint>
-                        <rtc:ConstraintUnitType>
-                            <rtc:propertyIsEqualTo rtc:matchCase="false">
-                                <rtc:Literal>true</rtc:Literal>
-                            </rtc:propertyIsEqualTo>
-                        </rtc:ConstraintUnitType>
-                    </rtc:Constraint>
-                    <rtc:Constraint>
-                        <rtc:ConstraintUnitType>
-                            <rtc:propertyIsEqualTo rtc:matchCase="false">
-                                <rtc:Literal>false</rtc:Literal>
-                            </rtc:propertyIsEqualTo>
-                        </rtc:ConstraintUnitType>
-                    </rtc:Constraint>
-                </rtc:ConstraintListType>
-            </rtc:Constraint>
-            <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-        </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="x_min" rtc:unit="meter" rtc:defaultValue="-10.0" rtc:type="double" rtc:name="x_min">
-            <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-        </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="x_max" rtc:unit="meter" rtc:defaultValue="10.0" rtc:type="double" rtc:name="x_max">
-            <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-        </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="y_min" rtc:unit="meter" rtc:defaultValue="-10.0" rtc:type="double" rtc:name="y_min">
-            <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-        </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="y_max" rtc:unit="meter" rtc:defaultValue="10.0" rtc:type="double" rtc:name="y_max">
-            <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-        </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="resolution" rtc:unit="meter" rtc:defaultValue="0.05" rtc:type="double" rtc:name="resolution">
-            <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-        </rtc:Configuration>
-      <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="init_pose_x" rtc:unit="meter" rtc:defaultValue="0.0" rtc:type="double" rtc:name="init_pose_x">
-        <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-      </rtc:Configuration>
-      <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="init_pose_y" rtc:unit="meter" rtc:defaultValue="0.0" rtc:type="double" rtc:name="init_pose_y">
-        <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-      </rtc:Configuration>
-      <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="init_pose_th" rtc:unit="meter" rtc:defaultValue="0.0" rtc:type="double" rtc:name="init_pose_th">
-        <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-      </rtc:Configuration>
-      <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="log_dir" rtc:unit="" rtc:defaultValue="log_out" rtc:type="string" rtc:name="log_dir">
-            <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-        </rtc:Configuration>
-        <rtc:Configuration xsi:type="rtcExt:configuration_ext" rtcExt:variableName="log_enable" rtc:unit="" rtc:defaultValue="log_enable" rtc:type="string" rtc:name="log_enable">
-            <rtc:Constraint>
-                <rtc:ConstraintListType>
-                    <rtc:Constraint>
-                        <rtc:ConstraintUnitType>
-                            <rtc:propertyIsEqualTo rtc:matchCase="false">
-                                <rtc:Literal>true</rtc:Literal>
-                            </rtc:propertyIsEqualTo>
-                        </rtc:ConstraintUnitType>
-                    </rtc:Constraint>
-                    <rtc:Constraint>
-                        <rtc:ConstraintUnitType>
-                            <rtc:propertyIsEqualTo rtc:matchCase="false">
-                                <rtc:Literal>false</rtc:Literal>
-                            </rtc:propertyIsEqualTo>
-                        </rtc:ConstraintUnitType>
-                    </rtc:Constraint>
-                </rtc:ConstraintListType>
-            </rtc:Constraint>
-            <rtcExt:Properties rtcExt:value="spin." rtcExt:name="__widget__"/>
-        </rtc:Configuration>
-    </rtc:ConfigurationSet>
-    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="LEFT" rtcExt:variableName="range" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::RangeData" rtc:name="range" rtc:portType="DataInPort"/>
-    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="LEFT" rtcExt:variableName="odometry" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedPose2D" rtc:name="odometry" rtc:portType="DataInPort"/>
-    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="estimatedPose" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedPose2D" rtc:name="estimatedPose" rtc:portType="DataOutPort"/>
-    <rtc:ServicePorts xsi:type="rtcExt:serviceport_ext" rtcExt:position="LEFT" rtc:name="gridMapper">
-        <rtc:ServiceInterface xsi:type="rtcExt:serviceinterface_ext" rtcExt:variableName="mapper" rtc:path="C:\Users\ysuga\rtm\idl" rtc:type="RTC::OGMapper" rtc:idlFile="C:\Users\ysuga\rtm\idl\MobileRobot.idl" rtc:instanceName="OGMapper" rtc:direction="Provided" rtc:name="OGMapper"/>
-    </rtc:ServicePorts>
-    <rtc:Language xsi:type="rtcExt:language_ext" rtc:kind="C++"/>
+<rtc:RtcProfile xmlns:rtc="http://www.openrtp.org/namespaces/rtc" xmlns:rtcDoc="http://www.openrtp.org/namespaces/rtc_doc" xmlns:rtcExt="http://www.openrtp.org/namespaces/rtc_ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" rtc:id="RTC:ssr:Navigation:Mapper_MRPT:1.0.0" rtc:version="0.2">
+  <rtc:BasicInfo rtc:activityType="PERIODIC" rtc:category="Navigation" rtc:componentKind="DataFlowComponent" rtc:componentType="STATIC" rtc:creationDate="2013-07-17T13:19:33+09:00" rtc:description="Mapper RTC using MRPT" rtc:executionRate="1000.0" rtc:executionType="PeriodicExecutionContext" rtc:maxInstances="1" rtc:name="Mapper_MRPT" rtc:updateDate="2013-07-18T11:35:13.287+09:00" rtc:vendor="ssr" rtc:version="1.0.0" rtcExt:saveProject="PROJECT_NAME" xsi:type="rtcExt:basic_info_ext">
+    <rtcDoc:Doc rtcDoc:algorithm="" rtcDoc:creator="" rtcDoc:description="" rtcDoc:inout="" rtcDoc:license="" rtcDoc:reference=""/>
+  </rtc:BasicInfo>
+  <rtc:Language rtc:kind="C++" xsi:type="rtcExt:language_ext"/>
+  <rtc:Actions>
+    <rtc:OnInitialize rtc:implemented="true" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnFinalize rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnStartup rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnShutdown rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnActivated rtc:implemented="true" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnDeactivated rtc:implemented="true" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnAborting rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnError rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnReset rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnExecute rtc:implemented="true" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnStateUpdate rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnRateChanged rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnAction rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+    <rtc:OnModeChanged rtc:implemented="false" xsi:type="rtcDoc:action_status_doc"/>
+  </rtc:Actions>
+  <rtc:ConfigurationSet>
+    <rtc:Configuration rtc:defaultValue="0.05" rtc:name="resolution" rtc:type="string" rtc:unit="" rtcExt:variableName="resolution" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="0.0" rtc:name="init_pose_th" rtc:type="string" rtc:unit="" rtcExt:variableName="init_pose_th" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="log_out" rtc:name="log_dir" rtc:type="string" rtc:unit="" rtcExt:variableName="log_dir" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="0.1" rtc:name="localization_lin_distance" rtc:type="string" rtc:unit="" rtcExt:variableName="localization_lin_distance" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="false" rtc:name="start_map_update_in_activated" rtc:type="string" rtc:unit="" rtcExt:variableName="start_map_update_in_activated" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="10.0" rtc:name="y_max" rtc:type="string" rtc:unit="" rtcExt:variableName="y_max" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="-10.0" rtc:name="y_min" rtc:type="string" rtc:unit="" rtcExt:variableName="y_min" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="log_enable" rtc:name="log_enable" rtc:type="string" rtc:unit="" rtcExt:variableName="log_enable" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="0.0" rtc:name="init_pose_x" rtc:type="string" rtc:unit="" rtcExt:variableName="init_pose_x" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="0.0" rtc:name="init_pose_y" rtc:type="string" rtc:unit="" rtcExt:variableName="init_pose_y" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="-10.0" rtc:name="x_min" rtc:type="string" rtc:unit="" rtcExt:variableName="x_min" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="0" rtc:name="debug" rtc:type="string" rtc:unit="" rtcExt:variableName="debug" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="1.0" rtc:name="insertion_ang_distance" rtc:type="string" rtc:unit="" rtcExt:variableName="insertion_ang_distance" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="1.0" rtc:name="insertion_lin_distance" rtc:type="string" rtc:unit="" rtcExt:variableName="insertion_lin_distance" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="10.0" rtc:name="x_max" rtc:type="string" rtc:unit="" rtcExt:variableName="x_max" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+    <rtc:Configuration rtc:defaultValue="0.3" rtc:name="localization_ang_distance" rtc:type="string" rtc:unit="" rtcExt:variableName="localization_ang_distance" xsi:type="rtcExt:configuration_ext">
+      <rtcDoc:Doc rtcDoc:description="" rtcDoc:license="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit="" xsi:type="rtcExt:dataport_ext"/>
+      <rtcExt:Properties rtcExt:name="__widget__" rtcExt:value="text"/>
+    </rtc:Configuration>
+  </rtc:ConfigurationSet>
+  <rtc:DataPorts rtc:dataflowType="" rtc:idlFile="" rtc:interfaceType="" rtc:name="range" rtc:portType="DataInPort" rtc:subscriptionType="" rtc:type="RTC::RangeData" rtc:unit="" rtcExt:position="LEFT" rtcExt:variableName="range" xsi:type="rtcExt:dataport_ext">
+    <rtcDoc:Doc rtcDoc:description="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit=""/>
+  </rtc:DataPorts>
+  <rtc:DataPorts rtc:dataflowType="" rtc:idlFile="" rtc:interfaceType="" rtc:name="odometry" rtc:portType="DataInPort" rtc:subscriptionType="" rtc:type="RTC::TimedPose2D" rtc:unit="" rtcExt:position="LEFT" rtcExt:variableName="odometry" xsi:type="rtcExt:dataport_ext">
+    <rtcDoc:Doc rtcDoc:description="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit=""/>
+  </rtc:DataPorts>
+  <rtc:DataPorts rtc:dataflowType="" rtc:idlFile="" rtc:interfaceType="" rtc:name="estimatedPose" rtc:portType="DataOutPort" rtc:subscriptionType="" rtc:type="RTC::TimedPose2D" rtc:unit="" rtcExt:position="RIGHT" rtcExt:variableName="estimatedPose" xsi:type="rtcExt:dataport_ext">
+    <rtcDoc:Doc rtcDoc:description="" rtcDoc:number="" rtcDoc:occerrence="" rtcDoc:operation="" rtcDoc:semantics="" rtcDoc:type="" rtcDoc:unit=""/>
+  </rtc:DataPorts>
+  <rtc:ServicePorts rtc:name="gridMapper" rtcExt:position="LEFT" xsi:type="rtcExt:serviceport_ext">
+    <rtcDoc:Doc rtcDoc:description="" rtcDoc:ifdescription=""/>
+    <rtc:ServiceInterface rtc:direction="Provided" rtc:idlFile="" rtc:instanceName="OGMapper" rtc:name="OGMapper" rtc:path="" rtc:type="RTC::OGMapper" rtcExt:variableName="motion" xsi:type="rtcExt:serviceinterface_ext"/>
+  </rtc:ServicePorts>
 </rtc:RtcProfile>
