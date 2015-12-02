@@ -86,8 +86,9 @@ namespace ssr {
 		double* range;
 		int size;
 		float aperture;
+		Position3D offset;
 	public:
-		Range(const double *Range, int Size, const float Aperture) {
+		Range(const double *Range, int Size, const float Aperture) : offset(0,0,0,0,0,0){
 			this->aperture = Aperture;
 			this->size = Size;
 			this->range = new double[size];
@@ -214,6 +215,11 @@ namespace ssr {
 		}
 	};
 
+	class MapBuilderParam {
+	public:
+		MapBuilderParam() {}
+		virtual ~MapBuilderParam() {}
+	};
 
 	/**
 	*
@@ -224,9 +230,9 @@ namespace ssr {
 		virtual ~MapBuilder() {}
 
 	public:
-		virtual bool initialize(ssr::NamedString& namedString /*, ssr::Map* pMap=NULL*/) = 0;
+		virtual bool initialize(MapBuilderParam& param) = 0;
 
-		virtual bool setRangeSensorPosition(const ssr::Position3D& position) = 0;
+		// virtual bool setRangeSensorPosition(const ssr::Position3D& position) = 0;
 
 		virtual bool addPose(const ssr::Pose2D& pose) = 0;
 
@@ -234,13 +240,13 @@ namespace ssr {
 
 		virtual bool processMap() = 0;
 
-		virtual void log() = 0;
+		//virtual void log() = 0;
 
 		virtual void setRangeSensorRange(float min, float max) = 0;
 
 		virtual ssr::Pose2D getEstimatedPose() = 0;
 
-		virtual void save() = 0;
+		//virtual void save() = 0;
 
 		virtual void getCurrentMap(ssr::Map& map) = 0;
 

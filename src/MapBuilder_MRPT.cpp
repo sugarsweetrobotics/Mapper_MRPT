@@ -7,6 +7,11 @@
 #include <mrpt/base.h>
 #include <mrpt/obs.h>
 
+#include <mrpt/base.h>
+#include <mrpt/slam.h>
+#include <mrpt/maps.h>
+#include <mrpt/gui.h>
+#include <mrpt/utils.h>
 
 using namespace mrpt::utils;
 using namespace mrpt::poses;
@@ -18,9 +23,80 @@ using namespace mrpt::math;
 
 using namespace ssr;
 
+class MapBuilder_MRPT : public MapBuilder {
 
-#define RADIANS(x) (x)/180.0*M_PI
+	float m_range_min;
+	float m_range_max;
 
+	mrpt::slam::CMetricMapBuilderICP m_MapBuilder;
+
+	mrpt::utils::CFileOutputStream m_TimeStampLogFile;
+	mrpt::utils::CFileOutputStream m_EstimatedPathLogFile;
+	mrpt::utils::CFileOutputStream m_OdometryPathLogFile;
+
+
+	mrpt::gui::CDisplayWindow3DPtr	m_3DWindow;
+
+	mrpt::obs::CActionCollection m_ActionCollection;
+	mrpt::obs::CSensoryFrame m_SensoryFrame;
+	mrpt::poses::CPose3D m_RangeSensorPose;
+
+
+	bool m_isMapping;
+
+	MapBuilderParam param;
+
+public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+		/**
+		* Constructor
+		*/
+		MapBuilder_MRPT();
+
+	/**
+	* Destructor
+	*/
+	virtual ~MapBuilder_MRPT();
+
+
+public:
+	void setRangeSensorRange(float min, float max) {
+		m_range_min = min; m_range_max = max;
+	}
+
+public:
+
+	bool initialize(MapBuilderParam& param_);
+
+	bool addPose(const ssr::Pose2D& pose);
+
+	bool addRange(const ssr::Range& range);
+
+	bool processMap();
+
+	//void log();
+
+	ssr::Pose2D getEstimatedPose();
+
+	void getCurrentMap(ssr::Map& map);
+
+
+	int32_t startMapping();
+
+	int32_t stopMapping();
+
+	void setCurrentMap(const ssr::Map& map);
+
+	bool isMapping() { return m_isMapping; }
+};
+
+
+ssr::MapBuilder* ssr::createMapBuilder() {
+	return new MapBuilder_MRPT();
+}
+
+
+/*
 Map_MRPT::Map_MRPT()
 {
 	m_pMap = NULL;
@@ -37,7 +113,9 @@ Map_MRPT::~Map_MRPT()
 		delete m_pMap; m_pMap = NULL;
 	}
 }
+*/
 
+/*
 bool Map_MRPT::load(const std::string& fileName)
 {
   m_pMap = new mrpt::maps::CMultiMetricMap();
@@ -75,13 +153,14 @@ bool Map_MRPT::save(const std::string& fileName)
 	}
 	return false;
 }
-
+*/
 
 MapBuilder_MRPT::MapBuilder_MRPT()
 {
 	this->m_range_max = 20.0;
 	this->m_range_min = 0.10;
 	this->m_isMapping = false;
+
 }
 
 MapBuilder_MRPT::~MapBuilder_MRPT()
@@ -89,119 +168,117 @@ MapBuilder_MRPT::~MapBuilder_MRPT()
 
 }
 
-
-bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter) 
+bool MapBuilder_MRPT::initialize(MapBuilderParam& param_) 
 {
 	m_ActionCollection.clear();
 	m_SensoryFrame.clear();
 
-	m_RawLogOffset = parameter.getInt(TAG_RAWLOGOFFSET, DEFAULT_RAWLOGOFFSET);
-	m_LogOutDir = parameter.getString(TAG_LOGOUTPUT_DIR, DEFAULT_LOGOUTDIR);
-	m_LogFrequency = parameter.getInt(TAG_LOG_FREQUENCY, DEFAULT_LOGFREQ);
-	m_SavePoseLog = parameter.getBool(TAG_SAVE_POSE_LOG, DEFAULT_SAVE_POSE_LOG);
-	m_Save3DScene = parameter.getBool(TAG_SAVE_3D_SCENE, DEFAULT_SAVE_3D_SCENE);
-	m_Camera3DSceneFollowsRobot = parameter.getBool(TAG_CAMERA_3DSCENE_FOLLOWS_ROBOT, DEFAULT_CAMERA_3DSCENE_FOLLOWS_ROBOT);
-	m_ShowProgress3DRealTime = parameter.getBool(TAG_SHOW_PROGRESS_3D, DEFAULT_SHOW_PROGRESS_3D_REAL_TIME);
-	m_Save3DScene = true;
-
-	m_Logging = parameter.getBool(TAG_ENABLE_LOGGING, DEFAULT_ENABLE_LOGGING);
-	m_Verbose = parameter.getBool(TAG_VERBOSE, DEFAULT_VERBOSE);
+	MapBuilderParam_MRPT& param = (MapBuilderParam_MRPT&)param_;
 
 	/* ICP_param */
-	m_MapBuilder.ICP_params.maxIterations    = 80;    // The maximum number of iterations to execute if convergence is not achieved before
-	m_MapBuilder.ICP_params.minAbsStep_trans = 1e-6;  // If the correction in all translation coordinates (X,Y,Z) is below this threshold (in meters), iterations are terminated:
-	m_MapBuilder.ICP_params.minAbsStep_rot   = 1e-6;  // If the correction in all rotation coordinates (yaw,pitch,roll) is below this threshold (in radians), iterations are terminated:
+	if (param.ICP_algorithm == "icpClassic") {
+		m_MapBuilder.ICP_params.ICP_algorithm = icpClassic;
+	}
+	else if (param.ICP_algorithm == "icpLevenbergMarquardt") {
+		m_MapBuilder.ICP_params.ICP_algorithm = icpLevenbergMarquardt;
+	}
+	else if (param.ICP_algorithm == "icpIKF") {
+		m_MapBuilder.ICP_params.ICP_algorithm = icpIKF;
+	}
 
-	m_MapBuilder.ICP_params.thresholdDist    = 0.2;   // Initial maximum distance for matching a pair of points
-	m_MapBuilder.ICP_params.thresholdAng = RADIANS(10.0);     // An angular factor (in degrees) to increase the matching distance for distant points.
+	m_MapBuilder.ICP_params.onlyClosestCorrespondences = param.ICP_onlyClosestCorrespondences;
+	//m_MapBuilder.ICP_params.onlyUniqueRobust;
 
-	m_MapBuilder.ICP_params.ALFA             = 0.8;   // After convergence, the thresholds are multiplied by this constant and ICP keep running (provides finer matching)
+	m_MapBuilder.ICP_params.maxIterations = param.ICP_maxIterations;
+	m_MapBuilder.ICP_params.minAbsStep_trans = param.ICP_minAbsStep_trans;
+	m_MapBuilder.ICP_params.minAbsStep_rot = param.ICP_minAbsStep_rot;
 
-	m_MapBuilder.ICP_params.smallestThresholdDist=0.05; // This is the smallest the distance threshold can become after stopping ICP and accepting the result.
-	m_MapBuilder.ICP_params.onlyClosestCorrespondences=true; // 1: Use the closest points only, 0: Use all the correspondences within the threshold (more robust sometimes, but slower)
+	m_MapBuilder.ICP_params.thresholdDist = param.ICP_thresholdDist;
+	m_MapBuilder.ICP_params.thresholdAng = param.ICP_thresholdAng;
+	m_MapBuilder.ICP_params.ALFA = param.ICP_ALFA;
+	m_MapBuilder.ICP_params.smallestThresholdDist = param.ICP_smallestThresholdDist;
 
-	// 0: icpClassic
-	// 1: icpLevenbergMarquardt
-	m_MapBuilder.ICP_params.ICP_algorithm = icpClassic;
+	//m_MapBuilder.ICP_params.covariance_varPoints;
 
-	// decimation to apply to the point cloud being registered against the map
-	// Reduce to "1" to obtain the best accuracy
-	m_MapBuilder.ICP_params.corresponding_points_decimation = 5;;
+	//m_MapBuilder.ICP_params.doRANSAC;
+	//m_MapBuilder.ICP_params.ransac_minSetSize;
+	//m_MapBuilder.ICP_params.ransac_maxSetSize;
+	//m_MapBuilder.ICP_params.ransac_nSimulations;
+	//m_MapBuilder.ICP_params.ransac_mahalanobisDistanceThreshold;
+	//m_MapBuilder.ICP_params.ransac_fuseMaxDiffXY;
+	//m_MapBuilder.ICP_params.ransac_fuseMaxDiffPhi;
+	//m_MapBuilder.ICP_params.ransac_fuseByCorrsMatch;
+	//m_MapBuilder.ICP_params.normalizationStd;
 
-	m_MapBuilder.ICP_options.localizationLinDistance = parameter.getFloat(TAG_LOCALIZATION_LIN_DIST, DEFAULT_LOCALIZATION_LIN_DIST);// The distance threshold for correcting odometry with ICP (meters)  
-	m_MapBuilder.ICP_options.localizationAngDistance = parameter.getFloat(TAG_LOCALIZATION_ANG_DIST, DEFAULT_LOCALIZATION_ANG_DIST);// The distance threshold for correcting odometry with ICP (rad)
+	m_MapBuilder.ICP_params.corresponding_points_decimation = param.ICP_corresponding_points_decimation;
 
+	m_MapBuilder.ICP_options.insertionLinDistance = param.ICP_insertionLinDistance;
+	m_MapBuilder.ICP_options.insertionAngDistance = param.ICP_insertionAngDistance;
+	m_MapBuilder.ICP_options.localizationLinDistance = param.ICP_localizationLinDistance;
+	m_MapBuilder.ICP_options.localizationAngDistance = param.ICP_localizationAngDistance;
 
-	m_MapBuilder.ICP_options.insertionLinDistance	= parameter.getFloat(TAG_INSERTION_LIN_DIST, DEFAULT_INSERTION_LIN_DIST);//;	// The distance threshold for inserting observations in the map (meters)
-	m_MapBuilder.ICP_options.insertionAngDistance	= parameter.getFloat(TAG_INSERTION_ANG_DIST, DEFAULT_INSERTION_ANG_DIST);// 0.8;	// The distance threshold for inserting observations in the map (rad)
+	m_MapBuilder.ICP_options.minICPgoodnessToAccept = param.ICP_minICPgoodnessToAccept;	// Minimum ICP quality to accept correction [0,1].
 
-	m_MapBuilder.ICP_options.minICPgoodnessToAccept	= 0.40;	// Minimum ICP quality to accept correction [0,1].
-
-// Neeeded for LM method, which only supports point-map to point-map matching.
-	m_MapBuilder.ICP_options.matchAgainstTheGrid = 0;
+	m_MapBuilder.ICP_options.matchAgainstTheGrid = param.ICP_matchAgainstTheGrid;
 	
-	//mrpt::slam::TMetricMapInitializer i;
-	//i.metricMapClassType = CLASS_ID( COccupancyGridMap2D );
-	mrpt::maps::COccupancyGridMap2D::TMapDefinition i;
-	i.max_x = parameter.getFloat(TAG_MAP_MAX_X, DEFAULT_MAP_MAX_X);
-	i.max_y = parameter.getFloat(TAG_MAP_MAX_Y, DEFAULT_MAP_MAX_Y);
-	i.min_x = parameter.getFloat(TAG_MAP_MIN_X, DEFAULT_MAP_MIN_X);
-	i.min_y = parameter.getFloat(TAG_MAP_MIN_Y, DEFAULT_MAP_MIN_Y);
-	i.resolution = parameter.getFloat(TAG_MAP_RESOLUTION, DEFAULT_MAP_RESOLUTION);
+	mrpt::maps::COccupancyGridMap2D::TMapDefinition mapDefinition;
+	mapDefinition.max_x = param.MAP_max_x;
+	mapDefinition.max_y = param.MAP_max_y;
+	mapDefinition.min_x = param.MAP_min_x;
+	mapDefinition.min_y = param.MAP_min_y;
+	mapDefinition.resolution = param.MAP_resolution;
 
-	i.insertionOpts.mapAltitude = 0;
-	i.insertionOpts.useMapAltitude = 0;
-	i.insertionOpts.maxDistanceInsertion = 25;
-	i.insertionOpts.maxOccupancyUpdateCertainty = 0.55;
-	i.insertionOpts.considerInvalidRangesAsFreeSpace = 1;
-	i.insertionOpts.wideningBeamsWithDistance = 0;
+	mapDefinition.insertionOpts.mapAltitude = param.MAP_insertion_mapAltitude;
+	mapDefinition.insertionOpts.useMapAltitude = param.MAP_insertion_useMapAltitude;
+	mapDefinition.insertionOpts.maxDistanceInsertion = param.MAP_insertion_maxDistanceInsertion;
+	mapDefinition.insertionOpts.maxOccupancyUpdateCertainty = param.MAP_insertion_maxOccupancyUpdateCertainty;
+	mapDefinition.insertionOpts.considerInvalidRangesAsFreeSpace = param.MAP_insertion_considerInvalidRangesAsFreeSpace;
+	mapDefinition.insertionOpts.wideningBeamsWithDistance = param.MAP_insertion_wideningBeamsWithDistance;
+	//mapDefinition.insertionOpts.CFD_features_gaussian_size;
+	//mapDefinition.insertionOpts.CFD_features_median_size;
+	//mapDefinition.insertionOpts.decimation;
+	//mapDefinition.insertionOpts.horizontalTolerance;
 
-	i.likelihoodOpts.likelihoodMethod = mrpt::maps::COccupancyGridMap2D::lmLikelihoodField_Thrun;
-	i.likelihoodOpts.LF_decimation = 5;
-	i.likelihoodOpts.LF_stdHit = 0.20;
+	mapDefinition.likelihoodOpts.likelihoodMethod = mrpt::maps::COccupancyGridMap2D::lmLikelihoodField_Thrun;
+	mapDefinition.likelihoodOpts.LF_decimation = 5;
+	mapDefinition.likelihoodOpts.LF_stdHit = 0.20;
 
-	i.likelihoodOpts.LF_maxCorrsDistance = 0.30;
-	i.likelihoodOpts.LF_zHit = 0.999;
-	i.likelihoodOpts.LF_zRandom = 0.001;
-	i.likelihoodOpts.LF_maxRange = 30;
-	i.likelihoodOpts.LF_alternateAverageMethod = 0;
+	mapDefinition.likelihoodOpts.LF_maxCorrsDistance = 0.30;
+	mapDefinition.likelihoodOpts.LF_zHit = 0.999;
+	mapDefinition.likelihoodOpts.LF_zRandom = 0.001;
+	mapDefinition.likelihoodOpts.LF_maxRange = 30;
+	mapDefinition.likelihoodOpts.LF_alternateAverageMethod = 0;
 
-	m_MapBuilder.ICP_options.mapInitializers.push_back(i);
-	//mrpt::maps::TMetricMapInitializer i2;
+	m_MapBuilder.ICP_options.mapInitializers.push_back(mapDefinition);
+
+	/*
 	mrpt::maps::CSimplePointsMap::TMapDefinition i2;
 	//i2.metricMapClassType = CLASS_ID( mrpt::maps::CSimplePointsMap );
 	i2.insertionOpts.minDistBetweenLaserPoints = 0.05;
 	i2.insertionOpts.fuseWithExisting = false;
 	i2.insertionOpts.isPlanarMap = 1;
 	m_MapBuilder.ICP_options.mapInitializers.push_back(i2);
+	*/
 
 	m_MapBuilder.options.enableMapUpdating = false;
 
-	double init_x = parameter.getFloat(TAG_INIT_X, DEFAULT_INIT_X);
-	double init_y = parameter.getFloat(TAG_INIT_Y, DEFAULT_INIT_Y);
-	double init_th = parameter.getFloat(TAG_INIT_TH, DEFAULT_INIT_TH);
+	mrpt::poses::CPosePDFGaussian initialPose(mrpt::poses::CPose2D(param.initial_pose_x, param.initial_pose_y, param.initial_pose_phi));
+//	mrpt::maps::COccupancyGridMap2D gmap;
 
-	//m_MapBuilder.initialize();
-	mrpt::poses::CPosePDFGaussian pose(mrpt::poses::CPose2D(init_x, init_y, init_th));
-	mrpt::maps::CSimpleMap map;
-	mrpt::maps::COccupancyGridMap2D gmap;
-	//gmap.
-
-	m_MapBuilder.initialize(mrpt::maps::CSimpleMap(), &pose);
-	
+	m_MapBuilder.initialize(mrpt::maps::CSimpleMap(), &initialPose);
 
 	/* For Logging and Verbosity */
-	m_MapBuilder.options.alwaysInsertByClass.fromString("");
+	//m_MapBuilder.options.alwaysInsertByClass.fromString("");
 
+	/*
 	if(m_Verbose) {
 		m_MapBuilder.options.verbose = true;
 		m_MapBuilder.ICP_params.dumpToConsole();
 		m_MapBuilder.ICP_options.dumpToConsole();
 	}
+	*/
 
-	m_ActionCollection.clear();
-	m_SensoryFrame.clear();
-
+	/*
 	if(m_Logging) {
 		deleteFilesInDirectory(m_LogOutDir.c_str());
 		createDirectory(m_LogOutDir.c_str());
@@ -209,11 +286,12 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 		deleteFilesInDirectory(m_LogOutDir.c_str());
 		createDirectory(m_LogOutDir.c_str());
 	}
-
+	*/
 //	m_TimeStampLogFile.open(format("%s/log_times.txt", m_LogOutDir.c_str()));
 //	m_EstimatedPathLogFile.open(format("%s/log_estimated_path.txt", m_LogOutDir.c_str()));
 //	m_OdometryPathLogFile.open(format("%s/log_odometry_path.txt", m_LogOutDir.c_str()));
 
+	/*
 #if MRPT_HAS_WXWIDGETS
 	if (m_ShowProgress3DRealTime)
 	{
@@ -222,7 +300,7 @@ bool MapBuilder_MRPT::initialize(ssr::NamedString& parameter)
 		m_3DWindow->setCameraAzimuthDeg(-45);
 	}
 #endif
-
+	*/
 
 	return true;
 }
@@ -244,7 +322,7 @@ bool MapBuilder_MRPT::addPose(const ssr::Pose2D& deltaPose)
 
 bool MapBuilder_MRPT::addRange(const ssr::Range& range)
 {
-  mrpt::obs::CObservation2DRangeScanPtr observation = mrpt::obs::CObservation2DRangeScan::Create();
+	mrpt::obs::CObservation2DRangeScanPtr observation = mrpt::obs::CObservation2DRangeScan::Create();
 	observation->rightToLeft = true;
 	observation->validRange.resize(range.size);
 	observation->scan.resize(range.size);
@@ -252,12 +330,16 @@ bool MapBuilder_MRPT::addRange(const ssr::Range& range)
 	observation->timestamp = mrpt::system::getCurrentTime();
 	for(int i = 0;i < range.size; i++) {
 		observation->scan[i] = range.range[i];
-		if(observation->scan[i] > m_range_min && observation->scan[i] < m_range_max) {
+		//if(observation->scan[i] > m_range_min && observation->scan[i] < m_range_max) {
 			observation->validRange[i] = 1;
-		} else {
-			observation->validRange[i] = 0;
-		}
+		//} else {
+		//	observation->validRange[i] = 0;
+		//}
 	}
+	m_RangeSensorPose.x(range.offset.x);
+	m_RangeSensorPose.y(range.offset.y);
+	m_RangeSensorPose.z(range.offset.z);
+	m_RangeSensorPose.setYawPitchRoll(range.offset.yaw, range.offset.pitch, range.offset.roll);
 	observation->setSensorPose(m_RangeSensorPose);
 	m_SensoryFrame.insert(observation);
 
@@ -277,125 +359,6 @@ Pose2D MapBuilder_MRPT::getEstimatedPose()
 	CPose3D robotPose;
 	m_MapBuilder.getCurrentPoseEstimation()->getMean(robotPose);
 	return Pose2D(robotPose.x(), robotPose.y(), robotPose.yaw());
-}
-
-void MapBuilder_MRPT::log()
-{
-	if (m_Logging) {
-	if(m_LogCount % this->m_LogFrequency == 0) {
-		CPose3DPDFPtr poseEstimation = m_MapBuilder.getCurrentPoseEstimation();
-		if(m_SavePoseLog) {
-		  poseEstimation->saveToTextFile( mrpt::format("%s/mapbuilder_posepdf_%03d.txt", m_LogOutDir.c_str(), m_LogCount));
-		}
-	}
-	}
-	//m_EstimatedPathLogFile.printf("%i %f %f %f\n", m_LogCount, poseEstimation->getMeanVal().x(), poseEstimation->getMeanVal().y(), poseEstimation->getMeanVal().yaw());
-	m_LogCount++;
-}
-void MapBuilder_MRPT::update3DWindow()
-{
-	if(m_3DWindow.present()) {
-	  // this function is deplicated
-	  /*
-                mrpt::posesCPose3D robotPose;
-		m_MapBuilder.getCurrentPoseEstimation()->getMean(robotPose);
-
-		mrpt::opengl::COpenGLScenePtr scene = COpenGLScene::Create();
-		mrpt::opengl::COpenGLViewportPtr view = scene->getViewport("main");
-		ASSERT_(view);
-
-		COpenGLViewportPtr view_map = scene->createViewport("mini-map");
-		view_map->setBorderSize(2);
-		view_map->setViewportPosition(0.01, 0.01, 0.35, 0.35);
-		view_map->setTransparent(false);
-
-		CCamera &cam = view_map->getCamera();
-		if(m_Camera3DSceneFollowsRobot) {
-			scene->enableFollowCamera(true);
-			cam.setAzimuthDegrees(-45);
-			cam.setElevationDegrees(45);
-		} else {
-			cam.setAzimuthDegrees(-90);
-			cam.setElevationDegrees(90);
-		}
-		cam.setPointingAt(robotPose);
-		cam.setZoomDistance(20);
-		cam.setOrthogonal();
-
-
-		CGridPlaneXYPtr gridPlane =CGridPlaneXY::Create(-200, 200, -200, 200, 0, 5);
-		gridPlane->setColor(0.4, 0.4, 0.4);
-		view->insert(gridPlane);
-		view_map->insert(CRenderizablePtr(gridPlane));
-
-		CSetOfObjectsPtr objects = CSetOfObjects::Create();
-		mrpt::maps::CMultiMetricMap* currentMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
-		currentMap->getAs3DObject(objects);
-		view->insert(objects);
-
-		CSetOfObjectsPtr pointMap = CSetOfObjects::Create();
-		if(currentMap->m_pointsMaps.size() > 0) {
-			currentMap->m_pointsMaps[0]->getAs3DObject(pointMap);
-			view_map->insert(pointMap);
-		}
-
-		CSetOfObjectsPtr robo = stock_objects::RobotPioneer();
-		robo->setPose(robotPose);
-		view->insert(robo);
-
-		CSetOfObjectsPtr robo_mini = stock_objects::RobotPioneer();
-		robo_mini->setPose(robotPose);
-		view_map->insert(robo_mini);
-
-		if(m_3DWindow) {
-			COpenGLScenePtr &scenePtr = m_3DWindow->get3DSceneAndLock();
-			scenePtr = scene;
-			m_3DWindow->unlockAccess3DScene();
-			m_3DWindow->setCameraPointingToPoint(robotPose.x(), robotPose.y(), robotPose.z());
-			m_3DWindow->forceRepaint();
-		}
-		
-		// Save as file:
-		if (m_Save3DScene)
-		{
-			static int step;
-			if(step++ % 100) {
-			  CFileGZOutputStream	f( mrpt::format( "%s/buildingmap_%05u.3Dscene", m_LogOutDir.c_str(), step ));
-				f << *scene;
-			}
-		}
-
-	  */
-	}
-}
-
-
-void MapBuilder_MRPT::save(void)
-{
-	if (m_Logging) {
-	  mrpt::maps::CSimpleMap map;
-		m_MapBuilder.getCurrentlyBuiltMap(map);
-
-
-		std::string str = mrpt::format("%s/_finalmap_.simplemap", m_LogOutDir.c_str());
-		printf("Dumping final map in binary format to: %s\n", str.c_str() );
-		m_MapBuilder.saveCurrentMapToFile(str);
-
-		mrpt::maps::CMultiMetricMap  *finalPointsMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
-		str = mrpt::format("%s/_finalmaps_.txt", m_LogOutDir.c_str());
-		printf("Dumping final metric maps to %s_XXX\n", str.c_str() );
-		finalPointsMap->saveMetricMapRepresentationToFile( str );
-
-		if(finalPointsMap->m_gridMaps.size() != 0) {
-			///finalPointsMap->
-		  str = mrpt::format("%s/_finalmaps_.gridmap", m_LogOutDir.c_str());
-			CFileOutputStream out_s(str);
-			out_s << (finalPointsMap->m_gridMaps)[0];
-			out_s.close();
-
-			//(finalPointsMap->m_gridMaps)[0]->saveMetricMapRepresentationToFile ("map_rep_gridmap");
-		}
-	}
 }
 
 void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
