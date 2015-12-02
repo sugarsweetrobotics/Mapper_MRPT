@@ -226,221 +226,399 @@ class Mapper_MRPT
   
   // </rtc-template>
 
-  // Configuration variable declaration
-  // <rtc-template block="config_declare">
-  /*!
-   * 
-   * - Name:  debug
-   * - DefaultValue: 0
-   */
-  int m_debug;
 
-  
-  /*!
-   * 
-   * - Name:  start_map_update_in_activated
-   * - DefaultValue: false
-   */
-  std::string m_start_map_update_in_activated;
+	 // Configuration variable declaration
+	 // <rtc-template block="config_declare">
+	 /*!
+	 * For Debug, set 1 to get verbosity output on console.
+	 * - Name:  debug
+	 * - DefaultValue: 0
+	 */
+	 int m_debug;
+	 /*!
+	 * If true,
+	 * - Name:  start_map_update_in_activated
+	 * - DefaultValue: false
+	 */
+	 std::string m_start_map_update_in_activated;
+	 /*!
+	 * Select algorithm of ICP mapping. icpClassic,
+	 * icpLevenbergMarquardt, icpIKF
+	 * - Name:  ICP_algorithm
+	 * - DefaultValue: icpClassic
+	 */
+	 std::string m_ICP_algorithm;
+	 /*!
+	 * The usual approach: to consider only the closest
+	 * correspondence for each local point (Default to true)
+	 * - Name:  ICP_onlyClosestCorrespondences
+	 * - DefaultValue: true
+	 */
+	 std::string m_ICP_onlyClosestCorrespondences;
+	 /*!
+	 * Apart of "onlyClosestCorrespondences=true", if this option
+	 * is enabled only the closest correspondence for each
+	 * reference point will be kept (default=false).
+	 * - Name:  ICP_onlyUniqueRobust
+	 * - DefaultValue: false
+	 */
+	 std::string m_ICP_onlyUniqueRobust;
+	 /*!
+	 * Maximum number of iterations to run.
+	 * - Name:  ICP_maxIterations
+	 * - DefaultValue: 80
+	 */
+	 unsigned int m_ICP_maxIterations;
+	 /*!
+	 * If the correction in all translation coordinates (X,Y,Z) is
+	 * below this threshold (in meters), iterations are terminated
+	 * (Default:1e-6)
+	 * - Name:  ICP_minAbsStep_trans
+	 * - DefaultValue: 0.000001
+	 */
+	 float m_ICP_minAbsStep_trans;
+	 /*!
+	 * If the correction in all rotation coordinates
+	 * (yaw,pitch,roll) is below this threshold (in radians),
+	 * iterations are terminated (Default:1e-6)
+	 * - Name:  ICP_minAbsStep_rot
+	 * - DefaultValue: 0.000001
+	 */
+	 float m_ICP_minAbsStep_rot;
+	 /*!
+	 * Initial threshold distance for two points to become a
+	 * correspondence.
+	 * - Name:  ICP_thresholdDist
+	 * - DefaultValue: 0.2
+	 */
+	 float m_ICP_thresholdDist;
+	 /*!
+	 * Initial threshold distance for two points to become a
+	 * correspondence.
+	 * - Name:  ICP_thresholdAng
+	 * - DefaultValue: 0.1745
+	 */
+	 float m_ICP_thresholdAng;
+	 /*!
+	 * The scale factor for threshold everytime convergence is
+	 * achieved.
+	 * - Name:  ICP_ALFA
+	 * - DefaultValue: 0.8
+	 */
+	 float m_ICP_ALFA;
+	 /*!
+	 * The size for threshold such that iterations will stop, since
+	 * it is considered precise enough.
+	 * - Name:  ICP_smallestThresholdDist
+	 * - DefaultValue: 0.05
+	 */
+	 float m_ICP_smallestThresholdDist;
+	 /*!
+	 * This is the normalization constant \sigma^2_p that is used
+	 * to scale the whole 3x3 covariance.  This has a default value
+	 * of (0.02)^2 , that is, a 2cm sigma.
+	 * - Name:  ICP_covariance_varPoints
+	 * - DefaultValue: 0.0004
+	 */
+	 float m_ICP_covariance_varPoints;
+	 /*!
+	 * Perform a RANSAC step after the ICP convergence, to obtain a
+	 * better estimation of the pose PDF.
+	 * - Name:  ICP_doRANSAC
+	 * - DefaultValue: false
+	 */
+	 std::string m_ICP_doRANSAC;
+	 /*!
+	 * RANSAC-step options
+	 * - Name:  ICP_ransac_nSimulations
+	 * - DefaultValue: 100
+	 */
+	 unsigned int m_ICP_ransac_nSimulations;
+	 /*!
+	 * RANSAC-step options
+	 * - Name:  ICP_ransac_minSetSize
+	 * - DefaultValue: 5
+	 */
+	 unsigned int m_ICP_ransac_minSetSize;
+	 /*!
+	 * RANSAC-step options
+	 * - Name:  ICP_ransac_maxSetSize
+	 * - DefaultValue: 20
+	 */
+	 unsigned int  m_ICP_ransac_maxSetSize;
+	 /*!
+	 * RANSAC-step options
+	 * - Name:  ICP_ransac_mahalanobisDistanceThreshold
+	 * - DefaultValue: 3.0
+	 */
+	 float m_ICP_ransac_mahalanobisDistanceThreshold;
+	 /*!
+	 * RANSAC-step option: The standard deviation in X,Y of
+	 * landmarks/points which are being matched (used to compute
+	 * covariances in the SoG)
+	 * - Name:  ICP_ransac_normalizationStd
+	 * - DefaultValue: 0.2
+	 */
+	 float m_ICP_ransac_normalizationStd;
+	 /*!
+	 * RANSAC-step option: The standard deviation in X,Y of
+	 * landmarks/points which are being matched (used to compute
+	 * covariances in the SoG)
+	 * - Name:  ICP_ransac_fuseByCorrsMatch
+	 * - DefaultValue: false
+	 */
+	 std::string m_ICP_ransac_fuseByCorrsMatch;
+	 /*!
+	 * RANSAC-step option: The standard deviation in X,Y of
+	 * landmarks/points which are being matched (used to compute
+	 * covariances in the SoG)
+	 * - Name:  ICP_ransac_fuseMaxDiffXY
+	 * - DefaultValue: 0.01
+	 */
+	 float m_ICP_ransac_fuseMaxDiffXY;
+	 /*!
+	 * RANSAC-step option: The standard deviation in X,Y of
+	 * landmarks/points which are being matched (used to compute
+	 * covariances in the SoG)
+	 * - Name:  ICP_ransac_fuseMaxDiffPhi
+	 * - DefaultValue: 0.001745
+	 */
+	 float m_ICP_ransac_fuseMaxDiffPhi;
+	 /*!
+	 * Cauchy kernel rho, for estimating the optimal transformation
+	 * covariance, in meters (default = 0.07m).
+	 * - Name:  ICP_kernel_rho
+	 * - DefaultValue: 0.07
+	 */
+	 float m_ICP_kernel_rho;
+	 /*!
+	 * Whether to use kernel_rho to smooth distances, or use
+	 * distances directly (default=true)
+	 * - Name:  ICP_use_kernel
+	 * - DefaultValue: true
+	 */
+	 std::string m_ICP_use_kernel;
+	 /*!
+	 * The size of the perturbance in x & y used to estimate the
+	 * Jacobians of the square error (in LM & IKF methods,
+	 * default=0.05).
+	 * - Name:  ICP_Axy_aprox_derivatives
+	 * - DefaultValue: 0.05
+	 */
+	 float m_ICP_Axy_aprox_derivatives;
+	 /*!
+	 * The initial value of the lambda parameter in the LM method
+	 * (default=1e-4).
+	 * - Name:  ICP_LM_initial_lambda
+	 * - DefaultValue: 0.0001
+	 */
+	 float m_ICP_LM_initial_lambda;
+	 /*!
+	 * Skip the computation of the covariance (saves some time)
+	 * (default=false)
+	 * - Name:  ICP_skip_cov_calculation
+	 * - DefaultValue: false
+	 */
+	 std::string m_ICP_skip_cov_calculation;
+	 /*!
+	 * Skip the (sometimes) expensive evaluation of the term
+	 * 'quality' at ICP output (Default=true)
+	 * - Name:  ICP_skip_quality_calculation
+	 * - DefaultValue: true
+	 */
+	 std::string m_ICP_skip_quality_calculation;
+	 /*!
+	 * Decimation of the point cloud being registered against the
+	 * reference one (default=5) - set to 1 to have the older (MRPT
+	 * <0.9.5) behavior   of not approximating ICP by ignoring the
+	 * correspondence of some points. The speed-up comes from a
+	 * decimation of the number of KD-tree queries,   the most
+	 * expensive step in ICP.
+	 * - Name:  ICP_corresponding_points_decimation
+	 * - DefaultValue: 5
+	 */
+	 unsigned int m_ICP_corresponding_points_decimation;
+	 /*!
+	 * (default:false) Match against the occupancy grid or the
+	 * points map? The former is quicker but less precise.
+	 * - Name:  ICP_matchAgainstTheGrid
+	 * - DefaultValue: 0
+	 */
+	 std::string m_ICP_matchAgainstTheGrid;
+	 /*!
+	 * Minimum robot linear (m) displacement for a new observation
+	 * to be inserted in the map.
+	 * - Name:  ICP_insertionLinDistance
+	 * - DefaultValue: 0.5
+	 * - Unit: meter
+	 */
+	 double m_ICP_insertionLinDistance;
+	 /*!
+	 * Minimum robot angular (rad, deg when loaded from the .ini)
+	 * displacement for a new observation to be inserted in the
+	 * map.
+	 * - Name:  ICP_insertionAngDistance
+	 * - DefaultValue: 0.8
+	 * - Unit: rad
+	 */
+	 double m_ICP_insertionAngDistance;
+	 /*!
+	 * Minimum robot linear (m) displacement for a new observation
+	 * to be used to do ICP-based localization (otherwise,
+	 * dead-reckon with odometry).
+	 * - Name:  ICP_localizationLinDistance
+	 * - DefaultValue: 0.5
+	 * - Unit: meter
+	 */
+	 double m_ICP_localizationLinDistance;
+	 /*!
+	 * Minimum robot angular (rad, deg when loaded from the .ini)
+	 * displacement for a new observation to be used to do
+	 * ICP-based localization (otherwise, dead-reckon with
+	 * odometry).
+	 * - Name:  ICP_localizationAngDistance
+	 * - DefaultValue: 0.8
+	 */
+	 double m_ICP_localizationAngDistance;
+	 /*!
+	 * Minimum ICP goodness (0,1) to accept the resulting corrected
+	 * position (default: 0.40)
+	 * - Name:  ICP_minICPgoodnessToAccept
+	 * - DefaultValue: 0.40
+	 */
+	 float m_ICP_minICPgoodnessToAccept;
+	 /*!
+	 * Initial size of Occupancy Grid Map
+	 * - Name:  MAP_min_x
+	 * - DefaultValue: -10.0
+	 * - Unit: meter
+	 */
+	 float m_MAP_min_x;
+	 /*!
+	 * Initial size of Occupancy Grid Map
+	 * - Name:  MAP_max_x
+	 * - DefaultValue: 10.0
+	 * - Unit: meter
+	 */
+	 float m_MAP_max_x;
+	 /*!
+	 * Initial size of Occupancy Grid Map
+	 * - Name:  MAP_min_y
+	 * - DefaultValue: -10.0
+	 * - Unit: meter
+	 */
+	 float m_MAP_min_y;
+	 /*!
+	 * Initial size of Occupancy Grid Map
+	 * - Name:  MAP_max_y
+	 * - DefaultValue: 10.0
+	 * - Unit: meter
+	 */
+	 float m_MAP_max_y;
+	 /*!
+	 * Resolution of Grid Map. Length of the grid
+	 * - Name:  MAP_resolution
+	 * - DefaultValue: 0.05
+	 * - Unit: meter
+	 */
+	 float m_MAP_resolution;
+	 /*!
+	 * The altitude (z-axis) of 2D scans (within a 0.01m tolerance)
+	 * for they to be inserted in this map!
+	 * - Name:  MAP_insertion_mapAltitude
+	 * - DefaultValue: 0.0
+	 * - Unit: meter
+	 */
+	 float m_MAP_insertion_mapAltitude;
+	 /*!
+	 * The parameter "mapAltitude" has effect while inserting
+	 * observations in the grid only if this is true.
+	 * - Name:  MAP_insertion_useMapAltitude
+	 * - DefaultValue: false
+	 */
+	 std::string m_MAP_insertion_useMapAltitude;
+	 /*!
+	 * The largest distance at which cells will be updated (Default
+	 * 15 meters)
+	 * - Name:  MAP_insertion_maxDistanceInsertion
+	 * - DefaultValue: 15
+	 */
+	 float m_MAP_insertion_maxDistanceInsertion;
+	 /*!
+	 * A value in the range [0.5,1] used for updating cell with a
+	 * bayesian approach (default 0.8)
+	 * - Name:  MAP_insertion_maxOccupancyUpdateCertainty
+	 * - DefaultValue: 0.55
+	 */
+	 float m_MAP_insertion_maxOccupancyUpdateCertainty;
+	 /*!
+	 * If set to true (default), invalid range values (no echo
+	 * rays) as consider as free space until
+	 * "maxOccupancyUpdateCertainty", but ONLY when the previous
+	 * and next rays are also an invalid ray.
+	 * - Name:  MAP_insertion_considerInvalidRangesAsFreeSpace
+	 * - DefaultValue: true
+	 */
+	 std::string m_MAP_insertion_considerInvalidRangesAsFreeSpace;
+	 /*!
+	 * Specify the decimation of the range scan (default=1 : take
+	 * all the range values!)
+	 * - Name:  MAP_insertion_decimation
+	 * - DefaultValue: 1
+	 */
+	 unsigned short int m_MAP_insertion_decimation;
+	 /*!
+	 * The tolerance in rads in pitch & roll for a laser scan to be
+	 * considered horizontal, then processed by calls to this class
+	 * (default=0).
+	 * - Name:  MAP_insertion_horizontalTolerance
+	 * - DefaultValue: 0
+	 */
+	 float m_MAP_insertion_horizontalTolerance;
+	 /*!
+	 * Gaussian sigma of the filter used in getAsImageFiltered (for
+	 * features detection) (Default=1) (0:Disabled)
+	 * - Name:  MAP_insertion_CFD_features_gaussian_size
+	 * - DefaultValue: 1
+	 */
+	 float m_MAP_insertion_CFD_features_gaussian_size;
+	 /*!
+	 * Size of the Median filter used in getAsImageFiltered (for
+	 * features detection) (Default=3) (0:Disabled)
+	 * - Name:  MAP_insertion_CFD_features_median_size
+	 * - DefaultValue: 3
+	 */
+	 float m_MAP_insertion_CFD_features_median_size;
+	 /*!
+	 * Enabled: Rays widen with distance to approximate the real
+	 * behavior of lasers, disabled: insert rays as simple lines
+	 * (Default=false)
+	 * - Name:  MAP_insertion_wideningBeamsWithDistance
+	 * - DefaultValue: false
+	 */
+	 std::string m_MAP_insertion_wideningBeamsWithDistance;
+	 /*!
+	 * Initial Pose of Robot
+	 * - Name:  initial_pose_x
+	 * - DefaultValue: 0.0
+	 */
+	 double m_initial_pose_x;
+	 /*!
+	 * Initial Pose of Robot
+	 * - Name:  initial_pose_y
+	 * - DefaultValue: 0.0
+	 * - Unit: meter
+	 */
+	 double m_initial_pose_y;
+	 /*!
+	 * Initial Pose of Robot
+	 * - Name:  initial_pose_phi
+	 * - DefaultValue: 0.0
+	 * - Unit: rad
+	 */
+	 double m_initial_pose_phi;
 
-#if 0
-  /*
-  /*!
-   * 
-   * - Name:  x_min
-   * - DefaultValue: -10.0
-   */
-  double m_x_min;
-  /*!
-   * 
-   * - Name:  x_max
-   * - DefaultValue: 10.0
-   */
-  double m_x_max;
-  /*!
-   * 
-   * - Name:  y_min
-   * - DefaultValue: -10.0
-   */
-  double m_y_min;
-  /*!
-   * 
-   * - Name:  y_max
-   * - DefaultValue: 10.0
-   */
-  double m_y_max;
-  /*!
-   * 
-   * - Name:  resolution
-   * - DefaultValue: 0.05
-   */
-  double m_resolution;
-  /*!
-   * 
-   * - Name:  init_pose_x
-   * - DefaultValue: 0.0
-   */
-  double m_init_pose_x;
-  /*!
-   * 
-   * - Name:  init_pose_y
-   * - DefaultValue: 0.0
-   */
-  double m_init_pose_y;
-  /*!
-   * 
-   * - Name:  init_pose_th
-   * - DefaultValue: 0.0
-   */
-  double m_init_pose_th;
-  /*!
-   * 
-   * - Name:  localization_lin_distance
-   * - DefaultValue: 0.
-   */
-  double m_localization_lin_distance;
-  /*!
-   * 
-   * - Name:  localization_ang_distance
-   * - DefaultValue: 0.
-   */
-  double m_localization_ang_distance;
-  /*!
-   * 
-   * - Name:  insertion_lin_distance
-   * - DefaultValue: 0.
-   */
-  double m_insertion_lin_distance;
-  /*!
-   * 
-   * - Name:  insertion_ang_distance
-   * - DefaultValue: 0.
-   */
-  double m_insertion_ang_distance;
-  /*!
-   * 
-   * - Name:  log_dir
-   * - DefaultValue: log_out
-   */
-  std::string m_log_dir;
-  /*!
-   * 
-   * - Name:  log_enable
-   * - DefaultValue: log_enable
-   */
-  std::string m_log_enable;
-#endif
-
-  std::string ICP_algorithm; //!< icpClassic, icpLevenbergMarquardt, icpIKF
-
-  std::string	ICP_onlyClosestCorrespondences;  //!< The usual approach: to consider only the closest correspondence for each local point (Default to true)
-  std::string 	ICP_onlyUniqueRobust; //! Apart of "onlyClosestCorrespondences=true", if this option is enabled only the closest correspondence for each reference point will be kept (default=false).
-
-  unsigned int	ICP_maxIterations;  //!< Maximum number of iterations to run.
-  float           ICP_minAbsStep_trans; //!< If the correction in all translation coordinates (X,Y,Z) is below this threshold (in meters), iterations are terminated (Default:1e-6)
-  float           ICP_minAbsStep_rot;   //!< If the correction in all rotation coordinates (yaw,pitch,roll) is below this threshold (in radians), iterations are terminated (Default:1e-6)
-
-  float	ICP_thresholdDist, ICP_thresholdAng; //!< Initial threshold distance for two points to become a correspondence.
-  float	ICP_ALFA;  //!< The scale factor for threshold everytime convergence is achieved.
-  float	ICP_smallestThresholdDist;  //!< The size for threshold such that iterations will stop, since it is considered precise enough.
-
-  /** This is the normalization constant \f$ \sigma^2_p \f$ that is used to scale the whole 3x3 covariance.
-  *  This has a default value of \f$ (0.02)^2 \f$, that is, a 2cm sigma.
-  *  See the paper: ....
-  */
-  float	ICP_covariance_varPoints;
-
-  std::string	ICP_doRANSAC;  //!< Perform a RANSAC step after the ICP convergence, to obtain a better estimation of the pose PDF.
-
-  /** RANSAC-step options: */
-  unsigned int	ICP_ransac_minSetSize, ICP_ransac_maxSetSize, ICP_ransac_nSimulations;
-  float			ICP_ransac_mahalanobisDistanceThreshold;
-
-  /** RANSAC-step option: The standard deviation in X,Y of landmarks/points which are being matched (used to compute covariances in the SoG) */
-  float			ICP_ransac_normalizationStd;
-  std::string			ICP_ransac_fuseByCorrsMatch;
-  float			ICP_ransac_fuseMaxDiffXY, ICP_ransac_fuseMaxDiffPhi;
-
-  /** Cauchy kernel rho, for estimating the optimal transformation covariance, in meters (default = 0.07m). */
-  float			ICP_kernel_rho;
-
-  /** Whether to use kernel_rho to smooth distances, or use distances directly (default=true) */
-  std::string			ICP_use_kernel;
-
-  /** The size of the perturbance in x & y used to estimate the Jacobians of the square error (in LM & IKF methods, default=0.05).*/
-  float			ICP_Axy_aprox_derivatives;
-
-  /** The initial value of the lambda parameter in the LM method (default=1e-4). */
-  float			ICP_LM_initial_lambda;
-
-  /** Skip the computation of the covariance (saves some time) (default=false) */
-  std::string			ICP_skip_cov_calculation;
-
-  /** Skip the (sometimes) expensive evaluation of the term 'quality' at ICP output (Default=true) */
-  std::string            ICP_skip_quality_calculation;
-
-  /** Decimation of the point cloud being registered against the reference one (default=5) - set to 1 to have the older (MRPT <0.9.5) behavior
-  *  of not approximating ICP by ignoring the correspondence of some points. The speed-up comes from a decimation of the number of KD-tree queries,
-  *  the most expensive step in ICP.
-  */
-  uint32_t        ICP_corresponding_points_decimation;
-
-
-  /** (default:false) Match against the occupancy grid or the points map? The former is quicker but less precise. */
-  std::string	ICP_matchAgainstTheGrid;
-
-  double ICP_insertionLinDistance;	//!< Minimum robot linear (m) displacement for a new observation to be inserted in the map.
-  double ICP_insertionAngDistance;	//!< Minimum robot angular (rad, deg when loaded from the .ini) displacement for a new observation to be inserted in the map.
-  double ICP_localizationLinDistance;	//!< Minimum robot linear (m) displacement for a new observation to be used to do ICP-based localization (otherwise, dead-reckon with odometry).
-  double ICP_localizationAngDistance;//!< Minimum robot angular (rad, deg when loaded from the .ini) displacement for a new observation to be used to do ICP-based localization (otherwise, dead-reckon with odometry).
-
-  double ICP_minICPgoodnessToAccept;  //!< Minimum ICP goodness (0,1) to accept the resulting corrected position (default: 0.40)
-
-
-  float	MAP_min_x, MAP_max_x, MAP_min_y, MAP_max_y, MAP_resolution;	//!< See COccupancyGridMap2D::COccupancyGridMap2D
-
-
-
-  /** The altitude (z-axis) of 2D scans (within a 0.01m tolerance) for they to be inserted in this map!
-  */
-  float	MAP_insertion_mapAltitude;
-
-  /** The parameter "mapAltitude" has effect while inserting observations in the grid only if this is true.
-  */
-  std::string	MAP_insertion_useMapAltitude;
-
-  /** The largest distance at which cells will be updated (Default 15 meters)
-  */
-  float	MAP_insertion_maxDistanceInsertion;
-
-  /** A value in the range [0.5,1] used for updating cell with a bayesian approach (default 0.8)
-  */
-  float	MAP_insertion_maxOccupancyUpdateCertainty;
-
-  /** If set to true (default), invalid range values (no echo rays) as consider as free space until "maxOccupancyUpdateCertainty", but ONLY when the previous and next rays are also an invalid ray.
-  */
-  bool	MAP_insertion_considerInvalidRangesAsFreeSpace;
-
-  /** Specify the decimation of the range scan (default=1 : take all the range values!)
-  */
-  uint16_t	MAP_insertion_decimation;
-
-  /** The tolerance in rads in pitch & roll for a laser scan to be considered horizontal, then processed by calls to this class (default=0). */
-  float MAP_insertion_horizontalTolerance;
-
-  /** Gaussian sigma of the filter used in getAsImageFiltered (for features detection) (Default=1) (0:Disabled) */
-  float	MAP_insertion_CFD_features_gaussian_size;
-
-  /** Size of the Median filter used in getAsImageFiltered (for features detection) (Default=3) (0:Disabled) */
-  float	MAP_insertion_CFD_features_median_size;
-
-  std::string	MAP_insertion_wideningBeamsWithDistance;	//!< Enabled: Rays widen with distance to approximate the real behavior of lasers, disabled: insert rays as simple lines (Default=false)
-
-  double initial_pose_x;
-  double initial_pose_y;
-  double initial_pose_phi;
-
-  // </rtc-template>
+	 // </rtc-template>
 
   // DataInPort declaration
   // <rtc-template block="inport_declare">

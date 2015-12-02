@@ -198,16 +198,16 @@ namespace ssr {
 			ICP_onlyUniqueRobust = false;
 
 			ICP_maxIterations = 80;    // The maximum number of iterations to execute if convergence is not achieved before
-			ICP_minAbsStep_trans = 1e-6;  // If the correction in all translation coordinates (X,Y,Z) is below this threshold (in meters), iterations are terminated:
-			ICP_minAbsStep_rot = 1e-6;  // If the correction in all rotation coordinates (yaw,pitch,roll) is below this threshold (in radians), iterations are terminated:
+			ICP_minAbsStep_trans = 1e-6f;  // If the correction in all translation coordinates (X,Y,Z) is below this threshold (in meters), iterations are terminated:
+			ICP_minAbsStep_rot = 1e-6f;  // If the correction in all rotation coordinates (yaw,pitch,roll) is below this threshold (in radians), iterations are terminated:
 
-			ICP_thresholdDist = 0.2;   // Initial maximum distance for matching a pair of points
-			ICP_thresholdAng = 0.1745;//  RADIANS(10.0);     // An angular factor (in degrees) to increase the matching distance for distant points.
-			ICP_ALFA = 0.8;   // After convergence, the thresholds are multiplied by this constant and ICP keep running (provides finer matching)
-			ICP_smallestThresholdDist = 0.05; // This is the smallest the distance threshold can become after stopping ICP and accepting the result.
+			ICP_thresholdDist = 0.2f;   // Initial maximum distance for matching a pair of points
+			ICP_thresholdAng = 0.1745f;//  RADIANS(10.0);     // An angular factor (in degrees) to increase the matching distance for distant points.
+			ICP_ALFA = 0.8f;   // After convergence, the thresholds are multiplied by this constant and ICP keep running (provides finer matching)
+			ICP_smallestThresholdDist = 0.05f; // This is the smallest the distance threshold can become after stopping ICP and accepting the result.
 
 
-			ICP_covariance_varPoints = 0.0004;
+			ICP_covariance_varPoints = 0.0004f;
 
 			ICP_doRANSAC = false;
 			/** RANSAC-step options: */
@@ -217,15 +217,15 @@ namespace ssr {
 			ICP_ransac_mahalanobisDistanceThreshold = 3.0;
 
 			/** RANSAC-step option: The standard deviation in X,Y of landmarks/points which are being matched (used to compute covariances in the SoG) */
-			ICP_normalizationStd = 0.2;
+			ICP_normalizationStd = 0.2f;
 			ICP_ransac_fuseByCorrsMatch = false;
-			ICP_ransac_fuseMaxDiffXY = 0.01;
-			ICP_ransac_fuseMaxDiffPhi = 0.001745;// RADIANS(0.1);
+			ICP_ransac_fuseMaxDiffXY = 0.01f;
+			ICP_ransac_fuseMaxDiffPhi = 0.001745f;// RADIANS(0.1);
 
-			ICP_kernel_rho = 0.07;
+			ICP_kernel_rho = 0.07f;
 			ICP_use_kernel = true;
-			ICP_Axy_aprox_derivatives = 0.05;
-			ICP_LM_initial_lambda = 1e-4;
+			ICP_Axy_aprox_derivatives = 0.05f;
+			ICP_LM_initial_lambda = 1e-4f;
 			ICP_skip_cov_calculation = false;
 			ICP_skip_quality_calculation = true;
 
@@ -247,12 +247,12 @@ namespace ssr {
 			MAP_min_x = -10.0f;
 			MAP_max_y = 10.0f;
 			MAP_min_y = -10.0f;
-			MAP_resolution = 0.05;
+			MAP_resolution = 0.05f;
 
 			MAP_insertion_mapAltitude = 0.0f;
 			MAP_insertion_useMapAltitude = false;
 			MAP_insertion_maxDistanceInsertion = 25;
-			MAP_insertion_maxOccupancyUpdateCertainty = 0.55;
+			MAP_insertion_maxOccupancyUpdateCertainty = 0.55f;
 			MAP_insertion_considerInvalidRangesAsFreeSpace = true;
 			MAP_insertion_wideningBeamsWithDistance = false;
 

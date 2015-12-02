@@ -4,6 +4,10 @@
 #undef HAVE_INTTYPES_H
 #endif
 
+//#include <mrpt/slam/CMultiMetricMap.h>
+#include <mrpt/slam/CMetricMapBuilderICP.h>
+#include <mrpt/poses/CPosePDFGaussian.h>
+/*
 #include <mrpt/base.h>
 #include <mrpt/obs.h>
 
@@ -12,12 +16,13 @@
 #include <mrpt/maps.h>
 #include <mrpt/gui.h>
 #include <mrpt/utils.h>
+*/
 
 using namespace mrpt::utils;
 using namespace mrpt::poses;
 using namespace mrpt::slam;
 using namespace mrpt::opengl;
-using namespace mrpt::gui;
+//using namespace mrpt::gui;
 using namespace mrpt::system;
 using namespace mrpt::math;
 
@@ -35,7 +40,7 @@ class MapBuilder_MRPT : public MapBuilder {
 	mrpt::utils::CFileOutputStream m_OdometryPathLogFile;
 
 
-	mrpt::gui::CDisplayWindow3DPtr	m_3DWindow;
+	//mrpt::gui::CDisplayWindow3DPtr	m_3DWindow;
 
 	mrpt::obs::CActionCollection m_ActionCollection;
 	mrpt::obs::CSensoryFrame m_SensoryFrame;
@@ -187,7 +192,7 @@ bool MapBuilder_MRPT::initialize(MapBuilderParam& param_)
 	}
 
 	m_MapBuilder.ICP_params.onlyClosestCorrespondences = param.ICP_onlyClosestCorrespondences;
-	//m_MapBuilder.ICP_params.onlyUniqueRobust;
+	m_MapBuilder.ICP_params.onlyUniqueRobust = param.ICP_onlyUniqueRobust;
 
 	m_MapBuilder.ICP_params.maxIterations = param.ICP_maxIterations;
 	m_MapBuilder.ICP_params.minAbsStep_trans = param.ICP_minAbsStep_trans;
@@ -198,17 +203,17 @@ bool MapBuilder_MRPT::initialize(MapBuilderParam& param_)
 	m_MapBuilder.ICP_params.ALFA = param.ICP_ALFA;
 	m_MapBuilder.ICP_params.smallestThresholdDist = param.ICP_smallestThresholdDist;
 
-	//m_MapBuilder.ICP_params.covariance_varPoints;
+	m_MapBuilder.ICP_params.covariance_varPoints = param.ICP_covariance_varPoints;
 
-	//m_MapBuilder.ICP_params.doRANSAC;
-	//m_MapBuilder.ICP_params.ransac_minSetSize;
-	//m_MapBuilder.ICP_params.ransac_maxSetSize;
-	//m_MapBuilder.ICP_params.ransac_nSimulations;
-	//m_MapBuilder.ICP_params.ransac_mahalanobisDistanceThreshold;
-	//m_MapBuilder.ICP_params.ransac_fuseMaxDiffXY;
-	//m_MapBuilder.ICP_params.ransac_fuseMaxDiffPhi;
-	//m_MapBuilder.ICP_params.ransac_fuseByCorrsMatch;
-	//m_MapBuilder.ICP_params.normalizationStd;
+	m_MapBuilder.ICP_params.doRANSAC = param.ICP_doRANSAC;
+	m_MapBuilder.ICP_params.ransac_minSetSize = param.ICP_ransac_minSetSize;
+	m_MapBuilder.ICP_params.ransac_maxSetSize = param.ICP_ransac_maxSetSize;
+	m_MapBuilder.ICP_params.ransac_nSimulations = param.ICP_ransac_nSimulations;
+	m_MapBuilder.ICP_params.ransac_mahalanobisDistanceThreshold = param.ICP_ransac_mahalanobisDistanceThreshold;
+	m_MapBuilder.ICP_params.ransac_fuseMaxDiffXY = param.ICP_ransac_fuseMaxDiffXY;
+	m_MapBuilder.ICP_params.ransac_fuseMaxDiffPhi = param.ICP_ransac_fuseMaxDiffPhi;
+	m_MapBuilder.ICP_params.ransac_fuseByCorrsMatch = param.ICP_ransac_fuseByCorrsMatch;
+	m_MapBuilder.ICP_params.normalizationStd = param.ICP_normalizationStd;
 
 	m_MapBuilder.ICP_params.corresponding_points_decimation = param.ICP_corresponding_points_decimation;
 
