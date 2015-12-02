@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <rtc:RtcProfile rtc:version="0.2" rtc:id="RTC:Sugar Sweet Robotics:Navigation:Mapper_MRPT:1.0.3" xmlns:rtcExt="http://www.openrtp.org/namespaces/rtc_ext" xmlns:rtcDoc="http://www.openrtp.org/namespaces/rtc_doc" xmlns:rtc="http://www.openrtp.org/namespaces/rtc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <rtc:BasicInfo xsi:type="rtcExt:basic_info_ext" rtcExt:saveProject="Mapper_MRPT" rtc:updateDate="2015-12-02T22:36:52.898+09:00" rtc:creationDate="2013-07-17T13:19:33+09:00" rtc:version="1.0.3" rtc:vendor="Sugar Sweet Robotics" rtc:maxInstances="1" rtc:executionType="PeriodicExecutionContext" rtc:executionRate="1000.0" rtc:description="Mapper RTC using MRPT (Mobile Robot Programming Toolkit)" rtc:category="Navigation" rtc:componentKind="DataFlowComponent" rtc:activityType="PERIODIC" rtc:componentType="STATIC" rtc:name="Mapper_MRPT">
+    <rtc:BasicInfo xsi:type="rtcExt:basic_info_ext" rtcExt:saveProject="Mapper_MRPT" rtc:updateDate="2015-12-02T22:55:15.212+09:00" rtc:creationDate="2013-07-17T13:19:33+09:00" rtc:version="1.0.3" rtc:vendor="Sugar Sweet Robotics" rtc:maxInstances="1" rtc:executionType="PeriodicExecutionContext" rtc:executionRate="1000.0" rtc:description="Mapper RTC using MRPT (Mobile Robot Programming Toolkit)" rtc:category="Navigation" rtc:componentKind="DataFlowComponent" rtc:activityType="PERIODIC" rtc:componentType="STATIC" rtc:name="Mapper_MRPT">
+        <rtcDoc:Doc rtcDoc:reference="" rtcDoc:license="GPL" rtcDoc:creator="" rtcDoc:algorithm="" rtcDoc:inout="" rtcDoc:description="RT-component for SLAM (Simaltaneously Localization and Mapping) algorithm using MRPT (Mobile Robot Programming Toolkit). If you want to know about MRPT, see http://mrpt.org This RT-Component supports only 3 patterns of ICP SLAM. (Actually MRPT supports other types of SLAM). Use with NavigationManager, and Mobile Robot which has common interface for mobile robot. To build this component, please install mrpt-1.3.0. In windows, binary installing is recommended. Please see official website of mrpt."/>
         <rtcExt:VersionUpLogs></rtcExt:VersionUpLogs>
         <rtcExt:VersionUpLogs></rtcExt:VersionUpLogs>
         <rtcExt:VersionUpLogs></rtcExt:VersionUpLogs>
@@ -503,11 +504,20 @@
             <rtcExt:Properties rtcExt:value="text" rtcExt:name="__widget__"/>
         </rtc:Configuration>
     </rtc:ConfigurationSet>
-    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="LEFT" rtcExt:variableName="range" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::RangeData" rtc:name="range" rtc:portType="DataInPort"/>
-    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="LEFT" rtcExt:variableName="odometry" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedPose2D" rtc:name="odometry" rtc:portType="DataInPort"/>
-    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="estimatedPose" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedPose2D" rtc:name="estimatedPose" rtc:portType="DataOutPort"/>
+    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="LEFT" rtcExt:variableName="range" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::RangeData" rtc:name="range" rtc:portType="DataInPort">
+        <rtcDoc:Doc rtcDoc:operation="" rtcDoc:occerrence="" rtcDoc:unit="meter, rad" rtcDoc:semantics="" rtcDoc:number="" rtcDoc:type="" rtcDoc:description="Input for Ranger Data (LiDAR sensors.)"/>
+    </rtc:DataPorts>
+    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="LEFT" rtcExt:variableName="odometry" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedPose2D" rtc:name="odometry" rtc:portType="DataInPort">
+        <rtcDoc:Doc rtcDoc:operation="" rtcDoc:occerrence="" rtcDoc:unit="meter, rad" rtcDoc:semantics="" rtcDoc:number="" rtcDoc:type="" rtcDoc:description="Input for odometry of mobile robot."/>
+    </rtc:DataPorts>
+    <rtc:DataPorts xsi:type="rtcExt:dataport_ext" rtcExt:position="RIGHT" rtcExt:variableName="estimatedPose" rtc:unit="" rtc:subscriptionType="" rtc:dataflowType="" rtc:interfaceType="" rtc:idlFile="" rtc:type="RTC::TimedPose2D" rtc:name="estimatedPose" rtc:portType="DataOutPort">
+        <rtcDoc:Doc rtcDoc:operation="" rtcDoc:occerrence="" rtcDoc:unit="meter, rad" rtcDoc:semantics="" rtcDoc:number="" rtcDoc:type="" rtcDoc:description="Estimated pose of robot with SLAM algorithm (ICP)"/>
+    </rtc:DataPorts>
     <rtc:ServicePorts xsi:type="rtcExt:serviceport_ext" rtcExt:position="LEFT" rtc:name="gridMapper">
-        <rtc:ServiceInterface xsi:type="rtcExt:serviceinterface_ext" rtcExt:variableName="mapper" rtc:path="C:\Users\ysuga\.wasanbon\idl" rtc:type="RTC::OGMapper" rtc:idlFile="C:\Users\ysuga\Development\rtm\wasanbon\workspace\vrep_mrpt_mapper_test\rtc\Mapper_MRPT\idl\MobileRobot.idl" rtc:instanceName="OGMapper" rtc:direction="Provided" rtc:name="OGMapper"/>
+        <rtc:ServiceInterface xsi:type="rtcExt:serviceinterface_ext" rtcExt:variableName="mapper" rtc:path="C:\Users\ysuga\.wasanbon\idl" rtc:type="RTC::OGMapper" rtc:idlFile="C:\Users\ysuga\Development\rtm\wasanbon\workspace\vrep_mrpt_mapper_test\rtc\Mapper_MRPT\idl\MobileRobot.idl" rtc:instanceName="OGMapper" rtc:direction="Provided" rtc:name="OGMapper">
+            <rtcDoc:Doc rtcDoc:docPostCondition="" rtcDoc:docPreCondition="" rtcDoc:docException="" rtcDoc:docReturn="" rtcDoc:docArgument="" rtcDoc:description="This port provides the services for Mapper. Please see MobileRobot.idl to know more about the interface. Ths port provides OGMapper service."/>
+        </rtc:ServiceInterface>
+        <rtcDoc:Doc rtcDoc:ifdescription="This port provides the services for Mapper. Please see MobileRobot.idl to know more about the interface. Ths port provides OGMapper service." rtcDoc:description="This port provides the services for Mapper. Please see MobileRobot.idl to know more about the interface. Ths port provides OGMapper service."/>
     </rtc:ServicePorts>
     <rtc:Language xsi:type="rtcExt:language_ext" rtc:kind="C++"/>
 </rtc:RtcProfile>
