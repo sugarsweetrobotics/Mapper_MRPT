@@ -353,10 +353,15 @@ bool MapBuilder_MRPT::addRange(const ssr::Range& range)
 
 bool MapBuilder_MRPT::processMap()
 {
-	m_MapBuilder.processActionObservation(m_ActionCollection, m_SensoryFrame);
+	if (isMapping()) {
+		m_MapBuilder.processActionObservation(m_ActionCollection, m_SensoryFrame);
+		m_SensoryFrame.clear();
+		m_ActionCollection.clear();
+		return true;
+	}
 	m_SensoryFrame.clear();
 	m_ActionCollection.clear();
-	return true;
+	return false;
 }
 
 Pose2D MapBuilder_MRPT::getEstimatedPose()

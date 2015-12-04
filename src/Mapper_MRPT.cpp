@@ -449,16 +449,21 @@ RTC::ReturnCode_t Mapper_MRPT::onExecute(RTC::UniqueId ec_id)
 	if (m_odomUpdated && m_rangeUpdated) {
 
 		m_mapperMutex.lock();
-		m_pMapBuilder->processMap();
+		bool success = m_pMapBuilder->processMap();
 		m_mapperMutex.unlock();
 
-		ssr::Pose2D pose = m_pMapBuilder->getEstimatedPose();
-		m_estimatedPose.data.position.x = pose.x;
-		m_estimatedPose.data.position.y = pose.y;
-		m_estimatedPose.data.heading = pose.th;
-		setTimestamp<RTC::TimedPose2D>(m_estimatedPose);
-		m_estimatedPoseOut.write();
-
+		if (success) {
+			ssr::Pose2D pose = m_pMapBuilder->getEstimatedPose();
+			m_estimatedPose.data.position.x = pose.x;
+			m_estimatedPose.data.position.y = pose.y;
+			m_estimatedPose.data.heading = pose.th;
+			setTimestamp<RTC::TimedPose2D>(m_estimatedPose);
+			m_estimatedPoseOut.write();
+		}
+		else {
+			//m_estimatedPose = m_odometry;
+			//m_estimatedPoseOut.write();
+		}
 
 		m_odomUpdated = m_rangeUpdated = false;
 	}
