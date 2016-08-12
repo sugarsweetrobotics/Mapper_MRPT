@@ -187,9 +187,6 @@ bool MapBuilder_MRPT::initialize(MapBuilderParam& param_)
 	else if (param.ICP_algorithm == "icpLevenbergMarquardt") {
 		m_MapBuilder.ICP_params.ICP_algorithm = icpLevenbergMarquardt;
 	}
-	else if (param.ICP_algorithm == "icpIKF") {
-		m_MapBuilder.ICP_params.ICP_algorithm = icpIKF;
-	}
 
 	m_MapBuilder.ICP_params.onlyClosestCorrespondences = param.ICP_onlyClosestCorrespondences;
 	m_MapBuilder.ICP_params.onlyUniqueRobust = param.ICP_onlyUniqueRobust;
