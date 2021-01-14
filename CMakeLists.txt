@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
+if(COMMAND cmake_policy)
+      cmake_policy(SET CMP0003 NEW)  # Required by CMake 2.7+
+endif()
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(Mapper_MRPT)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 include("${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
@@ -56,7 +63,54 @@ endif(${OpenRTM_FOUND})
 
 # Universal settings
 
-find_package(MRPT REQUIRED base obs gui slam hwdrivers maps)
+find_package(mrpt REQUIRED COMPONENTS obs poses maps slam config)
+set(MRPT_INCLUDE_DIRS 
+${mrpt_DIR}/include
+
+
+${mrpt_DIR}/libs/nanoflann/include
+${mrpt_DIR}/libs/nanoflann/include
+
+
+
+${mrpt_DIR}/include/mrpt/config/include
+${mrpt_DIR}/include/mrpt/containers/include
+${mrpt_DIR}/include/mrpt/core/include
+${mrpt_DIR}/include/mrpt/img/include
+${mrpt_DIR}/include/mrpt/io/include
+${mrpt_DIR}/include/mrpt/maps/include
+${mrpt_DIR}/include/mrpt/math/include
+${mrpt_DIR}/include/mrpt/obs/include
+${mrpt_DIR}/include/mrpt/opengl/include
+${mrpt_DIR}/include/mrpt/poses/include
+${mrpt_DIR}/include/mrpt/rtti/include
+${mrpt_DIR}/include/mrpt/serialization/include
+${mrpt_DIR}/include/mrpt/slam/include
+${mrpt_DIR}/include/mrpt/system/include
+${mrpt_DIR}/include/mrpt/tfest/include
+${mrpt_DIR}/include/mrpt/typemeta/include
+${mrpt_DIR}/include/mrpt/util/include
+)
+
+set(MRPT_LIBRARY_DIRS
+${mrpt_DIR}/lib
+$
+)
+
+set(MRPT_LIBS
+libmrpt-config216_msvc142_x64
+libmrpt-containers216_msvc142_x64
+libmrpt-core216_msvc142_x64
+libmrpt-io216_msvc142_x64
+libmrpt-maps216_msvc142_x64
+libmrpt-math216_msvc142_x64
+libmrpt-obs216_msvc142_x64
+libmrpt-poses216_msvc142_x64
+libmrpt-rtti216_msvc142_x64
+libmrpt-serialization216_msvc142_x64
+libmrpt-slam216_msvc142_x64
+)
+# find_package(mrpt-slam REQUIRED)
 
 
 
