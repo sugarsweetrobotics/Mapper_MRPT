@@ -5,8 +5,13 @@
 #endif
 
 //#include <mrpt/slam/CMultiMetricMap.h>
+///#include <mrpt/slam.h>
 #include <mrpt/slam/CMetricMapBuilderICP.h>
 #include <mrpt/poses/CPosePDFGaussian.h>
+#include <mrpt/maps/COccupancyGridMap2D.h>
+#include <mrpt/io/CFileOutputStream.h>
+#include <mrpt/io/CFileInputStream.h>
+#include <mrpt/obs/CObservation2DRangeScan.h>
 /*
 #include <mrpt/base.h>
 #include <mrpt/obs.h>
@@ -18,7 +23,7 @@
 #include <mrpt/utils.h>
 */
 
-using namespace mrpt::utils;
+//using namespace mrpt::utils;
 using namespace mrpt::poses;
 using namespace mrpt::slam;
 using namespace mrpt::opengl;
@@ -35,9 +40,9 @@ class MapBuilder_MRPT : public MapBuilder {
 
 	mrpt::slam::CMetricMapBuilderICP m_MapBuilder;
 
-	mrpt::utils::CFileOutputStream m_TimeStampLogFile;
-	mrpt::utils::CFileOutputStream m_EstimatedPathLogFile;
-	mrpt::utils::CFileOutputStream m_OdometryPathLogFile;
+	mrpt::io::CFileOutputStream m_TimeStampLogFile;
+	mrpt::io::CFileOutputStream m_EstimatedPathLogFile;
+	mrpt::io::CFileOutputStream m_OdometryPathLogFile;
 
 
 	//mrpt::gui::CDisplayWindow3DPtr	m_3DWindow;
@@ -52,7 +57,7 @@ class MapBuilder_MRPT : public MapBuilder {
 	MapBuilderParam param;
 
 public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	//EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		/**
 		* Constructor
 		*/
@@ -188,10 +193,10 @@ bool MapBuilder_MRPT::initialize(MapBuilderParam& param_)
 		m_MapBuilder.ICP_params.ICP_algorithm = icpLevenbergMarquardt;
 	}
 	else if (param.ICP_algorithm == "icpIKF") {
-		m_MapBuilder.ICP_params.ICP_algorithm = icpIKF;
+		m_MapBuilder.ICP_params.ICP_algorithm = icpClassic;// icpIKF;
 	}
 
-	m_MapBuilder.ICP_params.onlyClosestCorrespondences = param.ICP_onlyClosestCorrespondences;
+	// m_MapBuilder.ICP_params.onlyClosestCorrespondences = param.ICP_onlyClosestCorrespondences;
 	m_MapBuilder.ICP_params.onlyUniqueRobust = param.ICP_onlyUniqueRobust;
 
 	m_MapBuilder.ICP_params.maxIterations = param.ICP_maxIterations;
@@ -318,7 +323,8 @@ bool MapBuilder_MRPT::addPose(const ssr::Pose2D& deltaPose)
 	action.timestamp = mrpt::system::getCurrentTime();
 	static TTimeStamp oldTimestamp;
 	if(action.timestamp == oldTimestamp) {
-		action.timestamp = oldTimestamp +1;
+		//action.timestamp = oldTimestamp +1;
+		action.timestamp = mrpt::system::getCurrentTime();
 	}
 	oldTimestamp = action.timestamp;
 	m_ActionCollection.insert(action);
@@ -327,19 +333,22 @@ bool MapBuilder_MRPT::addPose(const ssr::Pose2D& deltaPose)
 
 bool MapBuilder_MRPT::addRange(const ssr::Range& range)
 {
-	mrpt::obs::CObservation2DRangeScanPtr observation = mrpt::obs::CObservation2DRangeScan::Create();
+	mrpt::obs::CObservation2DRangeScan::Ptr observation = mrpt::obs::CObservation2DRangeScan::Create();
 	observation->rightToLeft = true;
-	observation->validRange.resize(range.size);
-	observation->scan.resize(range.size);
+	observation->resizeScan(range.size);
+	//observation->validRange.resize(range.size);
+	//observation->scan.resize(range.size);
 	observation->aperture = range.aperture;
 	observation->timestamp = mrpt::system::getCurrentTime();
 	for(int i = 0;i < range.size; i++) {
-		observation->scan[i] = range.range[i];
+		//observation->scan[i] = range.range[i];
+		observation->setScanRange(i, range.range[i]);
 		//if(observation->scan[i] > m_range_min && observation->scan[i] < m_range_max) {
-			observation->validRange[i] = 1;
+		//	observation->validRange[i] = 1;
 		//} else {
 		//	observation->validRange[i] = 0;
 		//}
+		observation->setScanRangeValidity(i, range.range[i] < m_range_max);
 	}
 	m_RangeSensorPose.x(range.offset.x);
 	m_RangeSensorPose.y(range.offset.y);
@@ -373,33 +382,45 @@ Pose2D MapBuilder_MRPT::getEstimatedPose()
 
 void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
 {
-  mrpt::maps::CMultiMetricMap *pMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
-	if (pMap->m_gridMaps.size() == 0) {
+    const mrpt::maps::CMultiMetricMap *pMap = m_MapBuilder.getCurrentlyBuiltMetricMap();
+	//if (pMap->m_gridMaps.size() == 0) {
+	if (pMap->isEmpty()) {
 		std::cerr << "[MRPT] No Grid Map Error" << std::endl;
 		return;
 	}
-
-	int width = pMap->m_gridMaps[0]->getSizeX();
-	int height = pMap->m_gridMaps[0]->getSizeY();
+	
+	auto ogmap = m_MapBuilder.getCurrentlyBuiltMetricMap()->mapByClass<mrpt::maps::COccupancyGridMap2D>();	
+	int width = ogmap->getSizeX();
+	int height = ogmap->getSizeY();
+	//int width = pMap->m_gridMaps[0]->getSizeX();
+	//int height = pMap->m_gridMaps[0]->getSizeY();
 	//int height = pMap->m_gridMaps[0]->getSizeX();
 	//int width = pMap->m_gridMaps[0]->getSizeY();
 
-	float resolution = pMap->m_gridMaps[0]->getResolution();
-	float xmax = pMap->m_gridMaps[0]->getXMax();
-	float xmin = pMap->m_gridMaps[0]->getXMin();
-	float ymax = pMap->m_gridMaps[0]->getYMax();
-	float ymin = pMap->m_gridMaps[0]->getYMin();
+	//float resolution = pMap->m_gridMaps[0]->getResolution();
+	//float xmax = pMap->m_gridMaps[0]->getXMax();
+	//float xmin = pMap->m_gridMaps[0]->getXMin();
+	//float ymax = pMap->m_gridMaps[0]->getYMax();
+	//float ymin = pMap->m_gridMaps[0]->getYMin();
+
+	float resolution = ogmap->getResolution();
+	float xmax = ogmap->getXMax();
+	float xmin = ogmap->getXMin();
+	float ymax = ogmap->getYMax();
+	float ymin = ogmap->getYMin();
 	//float ymax = pMap->m_gridMaps[0]->getXMax();
 	//float ymin = pMap->m_gridMaps[0]->getXMin();
 	//float xmax = pMap->m_gridMaps[0]->getYMax();
 	//float xmin = pMap->m_gridMaps[0]->getYMin();
 
 	map.setSize(width, height, xmin/resolution, ymax/resolution);
-	map.setResolution(pMap->m_gridMaps[0]->getResolution());
+	map.setResolution(ogmap->getResolution());
+	//map.setResolution(pMap->m_gridMaps[0]->getResolution());
 	for(int i = 0;i < height;i++) {
 		for(int j = 0;j < width;j++) {
-			map.setCell(j, (height-i-1), static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(j, i)));
-//			map.setCell((width-j-1), i, static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
+			map.setCell(j, (height-i-1), static_cast<uint8_t>(255 * ogmap->getCell(j, i)));
+			//map.setCell(j, (height - i - 1), static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(j, i)));
+			//			map.setCell((width-j-1), i, static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
 //			map.setCell(j, (height-1-i), static_cast<uint8_t>(255 * pMap->m_gridMaps[0]->getCell(i, j)));
 		}
 	}
