@@ -64,14 +64,13 @@ endif(${OpenRTM_FOUND})
 # Universal settings
 
 find_package(mrpt REQUIRED COMPONENTS obs poses maps slam config)
+
+if (FALSE)
 set(MRPT_INCLUDE_DIRS 
 ${mrpt_DIR}/include
 
-
 ${mrpt_DIR}/libs/nanoflann/include
 ${mrpt_DIR}/libs/nanoflann/include
-
-
 
 ${mrpt_DIR}/include/mrpt/config/include
 ${mrpt_DIR}/include/mrpt/containers/include
@@ -110,8 +109,23 @@ libmrpt-rtti216_msvc142_x64
 libmrpt-serialization216_msvc142_x64
 libmrpt-slam216_msvc142_x64
 )
-# find_package(mrpt-slam REQUIRED)
 
+
+set(MRPT_DLIBS
+libmrpt-config216_msvc142_x64
+libmrpt-containers216_msvc142_x64
+libmrpt-core216_msvc142_x64
+libmrpt-io216_msvc142_x64
+libmrpt-maps216_msvc142_x64
+libmrpt-math216_msvc142_x64
+libmrpt-obs216_msvc142_x64
+libmrpt-poses216_msvc142_x64
+libmrpt-rtti216_msvc142_x64
+libmrpt-serialization216_msvc142_x64
+libmrpt-slam216_msvc142_x64
+)
+# find_package(mrpt-slam REQUIRED)
+endif()
 
 
 #enable_testing()

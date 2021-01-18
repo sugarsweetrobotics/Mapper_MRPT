@@ -33,7 +33,7 @@ add_definitions(${OPENRTM_CFLAGS})
 add_definitions(${OMNIORB_CFLAGS})
 
 include_directories(${MRPT_INCLUDE_DIRS})
-
+# set(CMAKE_DEBUG_POSTFIX d)
 
 MAP_ADD_STR(comp_hdrs "../" comp_headers)
 

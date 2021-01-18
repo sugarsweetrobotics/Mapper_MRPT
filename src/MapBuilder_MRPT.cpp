@@ -1,3 +1,5 @@
+
+#define _ENABLE_EXTENDED_ALIGNED_STORAGE
 #include "MapBuilder_MRPT.h"
 
 #ifdef HAVE_INTTYPES_H
@@ -9,8 +11,8 @@
 #include <mrpt/slam/CMetricMapBuilderICP.h>
 #include <mrpt/poses/CPosePDFGaussian.h>
 #include <mrpt/maps/COccupancyGridMap2D.h>
-#include <mrpt/io/CFileOutputStream.h>
-#include <mrpt/io/CFileInputStream.h>
+#include <mrpt/utils/CFileOutputStream.h>
+#include <mrpt/utils/CFileInputStream.h>
 #include <mrpt/obs/CObservation2DRangeScan.h>
 /*
 #include <mrpt/base.h>
@@ -40,9 +42,9 @@ class MapBuilder_MRPT : public MapBuilder {
 
 	mrpt::slam::CMetricMapBuilderICP m_MapBuilder;
 
-	mrpt::io::CFileOutputStream m_TimeStampLogFile;
-	mrpt::io::CFileOutputStream m_EstimatedPathLogFile;
-	mrpt::io::CFileOutputStream m_OdometryPathLogFile;
+	mrpt::utils::CFileOutputStream m_TimeStampLogFile;
+	mrpt::utils::CFileOutputStream m_EstimatedPathLogFile;
+	mrpt::utils::CFileOutputStream m_OdometryPathLogFile;
 
 
 	//mrpt::gui::CDisplayWindow3DPtr	m_3DWindow;
@@ -165,9 +167,9 @@ bool Map_MRPT::save(const std::string& fileName)
 }
 */
 
-MapBuilder_MRPT::MapBuilder_MRPT()
+MapBuilder_MRPT::MapBuilder_MRPT(): m_MapBuilder()
 {
-	this->m_range_max = 20.0;
+	this->m_range_max = 100.0;
 	this->m_range_min = 0.10;
 	this->m_isMapping = false;
 
@@ -185,6 +187,11 @@ bool MapBuilder_MRPT::initialize(MapBuilderParam& param_)
 
 	MapBuilderParam_MRPT& param = (MapBuilderParam_MRPT&)param_;
 
+	//mrpt::slam::CMetricMapBuilderICP::TConfigParams params = m_MapBuilder.ICP_options;;
+	//m_MapBuilder.ICP_options = params;
+	//m_MapBuilder.clear();
+	//mrpt 2
+	//m_MapBuilder.initialize();
 	/* ICP_param */
 	if (param.ICP_algorithm == "icpClassic") {
 		m_MapBuilder.ICP_params.ICP_algorithm = icpClassic;
@@ -259,7 +266,8 @@ bool MapBuilder_MRPT::initialize(MapBuilderParam& param_)
 	mapDefinition.likelihoodOpts.LF_maxRange = 30;
 	mapDefinition.likelihoodOpts.LF_alternateAverageMethod = 0;
 
-	m_MapBuilder.ICP_options.mapInitializers.push_back(mapDefinition);
+	//m_MapBuilder.ICP_options.mapInitializers.clear();
+	 m_MapBuilder.ICP_options.mapInitializers.push_back(mapDefinition);
 
 	/*
 	mrpt::maps::CSimplePointsMap::TMapDefinition i2;
@@ -348,7 +356,7 @@ bool MapBuilder_MRPT::addRange(const ssr::Range& range)
 		//} else {
 		//	observation->validRange[i] = 0;
 		//}
-		observation->setScanRangeValidity(i, range.range[i] < m_range_max);
+		observation->setScanRangeValidity(i, range.range[i] > 0 && range.range[i] < m_range_max);
 	}
 	m_RangeSensorPose.x(range.offset.x);
 	m_RangeSensorPose.y(range.offset.y);
@@ -388,8 +396,8 @@ void MapBuilder_MRPT::getCurrentMap(ssr::Map& map)
 		std::cerr << "[MRPT] No Grid Map Error" << std::endl;
 		return;
 	}
-	
-	auto ogmap = m_MapBuilder.getCurrentlyBuiltMetricMap()->mapByClass<mrpt::maps::COccupancyGridMap2D>();	
+	auto ogmap = m_MapBuilder.getCurrentlyBuiltMetricMap()->getMapByClass<mrpt::maps::COccupancyGridMap2D>();
+	//auto ogmap = m_MapBuilder.getCurrentlyBuiltMetricMap()->mapByClass<mrpt::maps::COccupancyGridMap2D>();	
 	int width = ogmap->getSizeX();
 	int height = ogmap->getSizeY();
 	//int width = pMap->m_gridMaps[0]->getSizeX();

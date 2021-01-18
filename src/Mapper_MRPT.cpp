@@ -7,6 +7,7 @@
  * $Id$
  */
 
+#define _ENABLE_EXTENDED_ALIGNED_STORAGE
 #include "Mapper_MRPT.h"
 #include "MapBuilder_MRPT.h"
 
